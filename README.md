@@ -1,13 +1,13 @@
 # AnyLabeling Setup
 
-Proyek ini menggunakan [AnyLabeling](https://github.com/vietanhdev/anylabeling) untuk anotasi gambar dengan dukungan AI.
+Proyek ini menggunakan AnyLabeling untuk anotasi gambar dengan dukungan AI.
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Python 3.10+** (disarankan Python 3.12)
 - **Windows 10/11**
 
-## 🚀 Instalasi
+## Instalasi
 
 ### 1. Install Python (jika belum ada)
 
@@ -39,7 +39,7 @@ pip install anylabeling
 pip install anylabeling-gpu
 ```
 
-## ▶️ Menjalankan AnyLabeling
+## Menjalankan AnyLabeling
 
 ```powershell
 # Pastikan virtual environment aktif
@@ -49,7 +49,7 @@ pip install anylabeling-gpu
 anylabeling
 ```
 
-## 📁 Struktur Folder
+## Struktur Folder
 
 ```
 Anylabel/
@@ -60,14 +60,14 @@ Anylabel/
 └── README.md
 ```
 
-## 🎯 Fitur AnyLabeling
+## Fitur AnyLabeling
 
-- ✅ Auto-labeling dengan AI models (YOLO, SAM, dll)
-- ✅ Manual annotation tools
-- ✅ Export ke berbagai format (YOLO, COCO, Pascal VOC)
-- ✅ Support untuk object detection, segmentation, classification
+- Auto-labeling dengan AI models (YOLO, SAM, dll)
+- Manual annotation tools
+- Export ke berbagai format (YOLO, COCO, Pascal VOC)
+- Support untuk object detection, segmentation, classification
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### PowerShell Script Execution Error
 
@@ -85,10 +85,10 @@ Gunakan:
 python -m pip install anylabeling
 ```
 
-## 📚 Dokumentasi
+## Dokumentasi
 
-- [AnyLabeling GitHub](https://github.com/vietanhdev/anylabeling)
-- [AnyLabeling Documentation](https://anylabeling.nrl.ai/)
+- AnyLabeling GitHub
+- AnyLabeling Documentation
 
 ---
 

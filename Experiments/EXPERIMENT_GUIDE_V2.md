@@ -1,9 +1,9 @@
-# 🧪 Eksperimen Deteksi Tandan Buah Segar (TBS) Kelapa Sawit
+# Eksperimen Deteksi Tandan Buah Segar (TBS) Kelapa Sawit
 **Versi 2.0 - Panduan Lengkap Step-by-Step**
 
 ---
 
-## 📋 Ringkasan Eksperimen
+## Ringkasan Eksperimen
 
 | Eksperimen | Input | Model | Target | Output |
 |------------|-------|-------|--------|--------|
@@ -14,7 +14,7 @@
 
 ---
 
-## 🎯 FASE 0: Persiapan Awal (Wajib!)
+## FASE 0: Persiapan Awal (Wajib!)
 
 ### 0.1. Install Dependencies
 ```bash
@@ -47,7 +47,7 @@ python simple_eda.py
 
 ---
 
-## 🎯 FASE 1: Anotasi Data (CRITICAL!)
+## FASE 1: Anotasi Data (CRITICAL!)
 
 ### 1.1. Anotasi Lokalisasi (Object Detection)
 **Tools:** AnyLabeling (AnyLabeling.exe)
@@ -55,7 +55,6 @@ python simple_eda.py
 **Langkah:**
 1. **Buka AnyLabeling**
    ```bash
-   # Pastikan venv aktif
    .\venv\Scripts\Activate
    anylabeling
    ```
@@ -88,7 +87,7 @@ Jika dataset klasifikasi (`ffb-ripeness-classification`) belum ada:
 
 ---
 
-## 🎯 FASE 2: Data Preparation
+## FASE 2: Data Preparation
 
 ### 2.1. EDA (Exploratory Data Analysis)
 ```bash
@@ -97,10 +96,10 @@ python simple_eda.py
 ```
 
 **Cek:**
-- [ ] Jumlah gambar teranotasi
-- [ ] Distribusi ukuran bounding box
-- [ ] Jumlah objek per gambar
-- [ ] Distribusi kelas (untuk klasifikasi)
+- Jumlah gambar teranotasi
+- Distribusi ukuran bounding box
+- Jumlah objek per gambar
+- Distribusi kelas (untuk klasifikasi)
 
 ### 2.2. Split Dataset
 ```bash
@@ -148,7 +147,7 @@ names: ['fresh_fruit_bunch']
 
 ---
 
-## 🎯 FASE 3: Eksperimen A - Lokalisasi (Detection)
+## FASE 3: Eksperimen A - Lokalisasi (Detection)
 
 ### **Eksperimen A.1: RGB Only (Baseline)**
 
@@ -325,7 +324,7 @@ def create_4channel(rgb_path, depth_path, output_path):
 
 ---
 
-## 🎯 FASE 4: Eksperimen B - Klasifikasi
+## FASE 4: Eksperimen B - Klasifikasi
 
 ### **Eksperimen B.1: RGB Only (2-Class: Ripe vs Unripe)**
 
@@ -381,7 +380,7 @@ yolo classify train config=config_b1_cls.yaml
 
 ---
 
-## 📊 FASE 5: Validasi & Reporting
+## FASE 5: Validasi & Reporting
 
 ### 5.1. Evaluasi Semua Model
 **Script:** `Experiments/scripts/evaluate_all.py`
@@ -449,30 +448,30 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 
 ---
 
-## 🚀 CEKLIST EKSEKUSI
+## CEKLIST EKSEKUSI
 
-### ✅ Tahap 1: Persiapan
+### Tahap 1: Persiapan
 - [ ] Extract dataset 28574489.zip
 - [ ] Install dependencies (ultralytics, opencv, dll)
 - [ ] Run `simple_eda.py`
 
-### ✅ Tahap 2: Anotasi
+### Tahap 2: Anotasi
 - [ ] Anotasi 300-500+ gambar di AnyLabeling
 - [ ] Verifikasi jumlah label = jumlah gambar
 
-### ✅ Tahap 3: Data Processing
+### Tahap 3: Data Processing
 - [ ] Run `split_localization_data.py`
 - [ ] Run `prepare_depth_data.py`
 - [ ] Create `ffb_localization.yaml`
 
-### ✅ Tahap 4: Eksperimen A.1 (RGB Baseline)
+### Tahap 4: Eksperimen A.1 (RGB Baseline)
 - [ ] Config: `config_a1_rgb.yaml` (seed 42)
 - [ ] Training Run #1
 - [ ] Config: `config_a1_rgb.yaml` (seed 123)
 - [ ] Training Run #2
 - [ ] Eval & Save metrics
 
-### ✅ Tahap 5: Eksperimen A.2 (Depth Only)
+### Tahap 5: Eksperimen A.2 (Depth Only)
 - [ ] Prepare depth data
 - [ ] Copy depth images ke folder split
 - [ ] Config: `config_a2_depth.yaml` (seed 42)
@@ -481,14 +480,14 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 - [ ] Training Run #2
 - [ ] Eval & Save metrics
 
-### ✅ Tahap 6: Eksperimen A.3 (RGB+Depth 4-ch)
+### Tahap 6: Eksperimen A.3 (RGB+Depth 4-ch)
 - [ ] Create `prepare_4ch_data.py`
 - [ ] Generate 4-channel dataset
 - [ ] Modifikasi model
 - [ ] Training 2x runs
 - [ ] Eval & Save metrics
 
-### ✅ Tahap 7: Eksperimen B.1 (Classification)
+### Tahap 7: Eksperimen B.1 (Classification)
 - [ ] Prepare classification dataset
 - [ ] Split data
 - [ ] Config: `config_b1_cls.yaml` (seed 42)
@@ -497,7 +496,7 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 - [ ] Training Run #2
 - [ ] Eval & Save metrics
 
-### ✅ Tahap 8: Reporting
+### Tahap 8: Reporting
 - [ ] Run `evaluate_all.py`
 - [ ] Run `failure_analysis.py`
 - [ ] Create `LAPORAN_HASIL.md`
@@ -505,7 +504,7 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 
 ---
 
-## 💡 Tips & Best Practices
+## Tips & Best Practices
 
 1. **GPU:** Jika tersedia, gunakan GPU (device: 0). Training akan jauh lebih cepat.
 2. **Monitor:** Gunakan `tensorboard --logdir runs/` untuk monitor training.
@@ -516,7 +515,7 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Error: "Label not found"
 - Pastikan anotasi selesai sebelum split

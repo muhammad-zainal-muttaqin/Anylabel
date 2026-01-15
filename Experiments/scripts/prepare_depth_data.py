@@ -22,8 +22,8 @@ def process_depth_maps():
     depth_files = glob.glob(os.path.join(SOURCE_DEPTH_DIR, "*.png"))
     total_files = len(depth_files)
     
-    print(f"🔄 Memproses {total_files} file depth map...")
-    print(f"   Target Normalisasi: {MIN_DEPTH}m - {MAX_DEPTH}m")
+    print(f"Memproses {total_files} file depth map...")
+    print(f"Target Normalisasi: {MIN_DEPTH}m - {MAX_DEPTH}m")
     
     count = 0
     for file_path in depth_files:
@@ -33,23 +33,12 @@ def process_depth_maps():
         depth_img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
         
         if depth_img is None:
-            print(f"❌ Gagal baca: {filename}")
+            print(f"Gagal baca: {filename}")
             continue
 
         # Convert ke float untuk operasi matematika
         depth_img = depth_img.astype(np.float32)
 
-        # Asumsi unit data asli adalah milimeter (umum di depth camera seperti RealSense) -> convert ke meter
-        # Jika data ternyata sudah meter, ubah line ini.
-        # depth_img_meter = depth_img / 1000.0 
-        
-        # Karena kita belum yakin 100% unitnya, kita pakai normalisasi Min-Max standard (0-255)
-        # berdasarkan instruksi "Normalisasi nilai depth map ke rentang 0-255"
-        
-        # Opsi A: Clip ke range spesifik (0.6 - 6m) lalu normalisasi 
-        # depth_img_meter = np.clip(depth_img_meter, MIN_DEPTH, MAX_DEPTH)
-        # norm_img = (depth_img_meter - MIN_DEPTH) / (MAX_DEPTH - MIN_DEPTH) * 255.0
-        
         # Opsi B: Langsung Normalisasi MinMax dari data yang ada di gambar (lebih aman visualisasinya)
         norm_img = cv2.normalize(depth_img, None, 0, 255, cv2.NORM_MINMAX)
         
@@ -67,7 +56,7 @@ def process_depth_maps():
         if count % 50 == 0:
             print(f"   ...terproses {count}/{total_files}")
 
-    print(f"✅ Selesai. Hasil depth 3-channel disimpan di: {OUTPUT_DEPTH_RGB_DIR}")
+    print(f"Selesai. Hasil depth 3-channel disimpan di: {OUTPUT_DEPTH_RGB_DIR}")
 
 if __name__ == "__main__":
     process_depth_maps()

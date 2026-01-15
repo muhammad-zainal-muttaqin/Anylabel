@@ -30,7 +30,7 @@ def create_failure_analysis_dirs():
     for d in dirs:
         os.makedirs(d, exist_ok=True)
     
-    print(f"📁 Output directory: {OUTPUT_DIR}")
+    print(f"Output directory: {OUTPUT_DIR}")
 
 def load_model():
     """Load trained model"""
@@ -38,11 +38,11 @@ def load_model():
     full_model_path = os.path.join(EXPERIMENTS_DIR, MODEL_PATH)
     
     if not os.path.exists(full_model_path):
-        print(f"❌ Model tidak ditemukan: {full_model_path}")
+        print(f"Model tidak ditemukan: {full_model_path}")
         print("   Pastikan training sudah selesai!")
         return None
     
-    print(f"📂 Loading model: {MODEL_PATH}")
+    print(f"Loading model: {MODEL_PATH}")
     return YOLO(full_model_path)
 
 def get_test_images():
@@ -51,7 +51,7 @@ def get_test_images():
     test_images_dir = os.path.join(DATASET_DIR, "images", "test")
     test_images = list(Path(test_images_dir).glob("*.png"))
     
-    print(f"📊 Found {len(test_images)} test images")
+    print(f"Found {len(test_images)} test images")
     return test_images
 
 def draw_boxes(image, detections, ground_truth, color, conf_threshold=0.25):
@@ -217,9 +217,9 @@ def analyze_failures(model, test_images):
 def generate_failure_report(summary, failure_cases):
     """Generate failure analysis report"""
     
-    report = "# 🔍 ANALISIS KEGAGALAN DETEKSI TBS\n\n"
+    report = "# ANALISIS KEGAGALAN DETEKSI TBS\n\n"
     
-    report += "## 📊 Ringkasan\n\n"
+    report += "## Ringkasan\n\n"
     report += f"- **Total Ground Truth**: {summary['total_ground_truth']}\n"
     report += f"- **Total Detections**: {summary['total_detections']}\n"
     report += f"- **Correct Detections**: {summary['correct']}\n"
@@ -233,7 +233,7 @@ def generate_failure_report(summary, failure_cases):
         report += f"- **False Positive Rate**: {fp_rate:.2f}%\n"
         report += f"- **False Negative Rate**: {fn_rate:.2f}%\n"
     
-    report += "\n## 📋 Kasus Kegagalan\n\n"
+    report += "\n## Kasus Kegagalan\n\n"
     
     if failure_cases:
         report += "| Gambar | FP | FN | Deteksi | GT |\n"
@@ -244,13 +244,13 @@ def generate_failure_report(summary, failure_cases):
     else:
         report += "Tidak ada kasus kegagalan ditemukan!\n"
     
-    report += "\n## 📂 Visualisasi\n\n"
+    report += "\n## Visualisasi\n\n"
     report += "Hasil visualisasi disimpan di:\n"
     report += f"- `{OUTPUT_DIR}/false_positives/` - Deteksi salah\n"
     report += f"- `{OUTPUT_DIR}/false_negatives/` - TBS tidak terdeteksi\n"
     report += f"- `{OUTPUT_DIR}/correct_detections/` - Deteksi benar\n"
     
-    report += "\n## 💡 Analisis Kegagalan Umum\n\n"
+    report += "\n## Analisis Kegagalan Umum\n\n"
     report += "### Penyebab False Positives:\n"
     report += "- Bayangan daun menyerupai TBS\n"
     report += "- Pecahan cahaya/metalik\n"
@@ -267,7 +267,7 @@ def generate_failure_report(summary, failure_cases):
     return report
 
 def main():
-    print("🔍 Analisis Kegagalan Deteksi")
+    print("Analisis Kegagalan Deteksi")
     print("="*60)
     
     # Create output directories
@@ -281,11 +281,11 @@ def main():
     # Get test images
     test_images = get_test_images()
     if not test_images:
-        print("❌ Tidak ada gambar test ditemukan!")
+        print("Tidak ada gambar test ditemukan!")
         return
     
     # Analyze
-    print("\n🔄 Mulai analisis...")
+    print("\nMulai analisis...")
     summary, failure_cases = analyze_failures(model, test_images)
     
     # Generate report
@@ -306,13 +306,13 @@ def main():
         cases_df.to_csv(os.path.join(OUTPUT_DIR, "failure_cases.csv"), index=False)
     
     print("\n" + "="*60)
-    print("✅ ANALISIS SELESAI")
+    print("ANALISIS SELESAI")
     print("="*60)
-    print(f"📁 Hasil: {OUTPUT_DIR}")
-    print(f"📄 Report: {report_path}")
-    print(f"📊 Summary: failure_summary.csv")
-    print(f"📋 Cases: failure_cases.csv")
-    print(f"🖼️  Images: false_positives/, false_negatives/, correct_detections/")
+    print(f"Hasil: {OUTPUT_DIR}")
+    print(f"Report: {report_path}")
+    print(f"Summary: failure_summary.csv")
+    print(f"Cases: failure_cases.csv")
+    print(f"Images: false_positives/, false_negatives/, correct_detections/")
 
 if __name__ == "__main__":
     main()

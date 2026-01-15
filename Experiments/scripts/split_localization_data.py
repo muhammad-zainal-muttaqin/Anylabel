@@ -26,7 +26,7 @@ def setup_directories():
     for split in ['train', 'val', 'test']:
         os.makedirs(os.path.join(OUTPUT_BASE_DIR, 'images', split), exist_ok=True)
         os.makedirs(os.path.join(OUTPUT_BASE_DIR, 'labels', split), exist_ok=True)
-    print(f"✅ Folder struktur dibuat di: {OUTPUT_BASE_DIR}")
+    print(f"Folder struktur dibuat di: {OUTPUT_BASE_DIR}")
 
 def split_dataset():
     """Membagi dataset menjadi train/val/test dan menyalin file"""
@@ -38,10 +38,10 @@ def split_dataset():
     
     total_images = len(image_files)
     if total_images == 0:
-        print(f"❌ Error: Tidak ditemukan gambar di {SOURCE_IMAGES_DIR}")
+        print(f"Error: Tidak ditemukan gambar di {SOURCE_IMAGES_DIR}")
         return
 
-    print(f"📄 Menemukan {total_images} gambar.")
+    print(f"Menemukan {total_images} gambar.")
 
     # 2. Acak urutan (Shuffle)
     random.seed(SEED)
@@ -56,11 +56,11 @@ def split_dataset():
     val_files = image_files[train_count : train_count + val_count]
     test_files = image_files[train_count + val_count:]
 
-    print(f"📊 Pembagian: Train={len(train_files)}, Val={len(val_files)}, Test={len(test_files)}")
+    print(f"Pembagian: Train={len(train_files)}, Val={len(val_files)}, Test={len(test_files)}")
 
     # 4. Fungsi helper untuk copy
     def copy_files(file_list, split_name):
-        print(f"🚀 Menyalin data {split_name}...")
+        print(f"Menyalin data {split_name}...")
         for img_path in file_list:
             # Info File
             filename = os.path.basename(img_path)
@@ -81,7 +81,6 @@ def split_dataset():
                 shutil.copy2(label_path, dest_label_path)
             else:
                 # Warning kalau label ga ada (normal jika belum anotasi semua)
-                # print(f"⚠️ Warning: Label tidak ditemukan untuk {filename}")
                 pass
 
     # 5. Eksekusi Copy
@@ -89,14 +88,14 @@ def split_dataset():
     copy_files(val_files, 'val')
     copy_files(test_files, 'test')
 
-    print("\n✅ Selesai! Dataset siap digunakan untuk training.")
-    print(f"📁 Lokasi: {OUTPUT_BASE_DIR}")
+    print("\nSelesai! Dataset siap digunakan untuk training.")
+    print(f"Lokasi: {OUTPUT_BASE_DIR}")
 
 if __name__ == "__main__":
     if not os.path.exists(SOURCE_LABELS_DIR):
-        print(f"⚠️  PERINGATAN: Folder label belum ada di '{SOURCE_LABELS_DIR}'")
-        print("    Script ini tetap akan jalan mengcopy gambar, tapi tanpa label.")
-        print("    Pastikan Anda sudah melakukan anotasi (Tahap 1.1) sebelum training serius.")
+        print(f"Peringatan: Folder label belum ada di '{SOURCE_LABELS_DIR}'")
+        print("Script ini tetap akan jalan mengcopy gambar, tapi tanpa label.")
+        print("Pastikan Anda sudah melakukan anotasi (Tahap 1.1) sebelum training serius.")
     
     setup_directories()
     split_dataset()

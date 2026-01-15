@@ -11,7 +11,7 @@ LOCALIZATION_LABEL_DIR = os.path.join(DATASET_DIR, "ffb-localization", "labels_y
 RIPENESS_DIR = os.path.join(DATASET_DIR, "ffb-ripeness-classification")
 
 def analyze_localization():
-    print("--- 🔍 ANALISIS DATASET LOKALISASI ---")
+    print("--- ANALISIS DATASET LOKALISASI ---")
     
     # Cek Gambar
     images = glob.glob(os.path.join(LOCALIZATION_IMG_DIR, "*.png"))
@@ -23,15 +23,15 @@ def analyze_localization():
         print(f"Jumlah Label : {len(labels)}")
         print(f"Status Anotasi: {len(labels)}/{len(images)} ({(len(labels)/len(images))*100:.1f}%)")
     else:
-        print("❌ Folder Label belum ditemukan (Belum ada anotasi).")
+        print("Folder Label belum ditemukan (Belum ada anotasi).")
 
 def analyze_ripeness():
-    print("\n--- 🔍 ANALISIS DATASET KLASIFIKASI KEMATANGAN ---")
+    print("\n--- ANALISIS DATASET KLASIFIKASI KEMATANGAN ---")
     
     # Cek Json COCO
     coco_path = os.path.join(RIPENESS_DIR, "_annotations.coco.json")
     if not os.path.exists(coco_path):
-        print("❌ Annotation file missing!")
+        print("Annotation file missing!")
         return
 
     with open(coco_path, 'r') as f:
@@ -55,10 +55,10 @@ def analyze_ripeness():
             unripe_count += 1
             
     print(f"Distribusi Anotasi:")
-    print(f"  🟠 Ripe-FFB   : {ripe_count}")
-    print(f"  🟢 Unripe-FFB : {unripe_count}")
+    print(f"  Ripe-FFB   : {ripe_count}")
+    print(f"  Unripe-FFB : {unripe_count}")
 
 if __name__ == "__main__":
     analyze_localization()
     analyze_ripeness()
-    print("\n✅ Check Selesai.")
+    print("\nCheck Selesai.")

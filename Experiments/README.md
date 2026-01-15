@@ -1,258 +1,236 @@
-# 🧪 Eksperimen Deteksi TBS Kelapa Sawit
+# FFB Detection Experiments - Technical Setup
 
-**Proyek:** Anylabel - Asisten Dosen  
-**Tanggal:** 2026-01-15  
-**Versi:** 2.0 (Clean)
+Project: Fresh Fruit Bunch Oil Palm Detection using YOLO Models  
+Last Updated: 2026-01-15
 
----
+## Prerequisites
 
-## 📋 Apa yang Dibuat?
+### System Requirements
+- Python 3.8+
+- GPU recommended (NVIDIA CUDA)
+- 10GB+ free disk space
+- Windows 10/11 or Linux
 
-SEMUA FILE TELAH DIBERSIHKAN - HANYA FILE PENTING SAJA!
-
-### ✅ Files Utama
-| File | Deskripsi |
-|------|-----------|
-| `EXPERIMENT_GUIDE_V2.md` | **Panduan lengkap** (WAJIB BACA!) |
-| `ffb_localization.yaml` | Config dataset YOLO |
-| `README.md` | File ini |
-
-### ✅ Scripts Python
-
-**Persiapan Data:**
-- `scripts/simple_eda.py` - Analisis dataset
-- `scripts/split_localization_data.py` - Split 70:20:10
-- `scripts/prepare_depth_data.py` - Proses depth
-
-**Training:**
-- `scripts/train_a1_rgb.py` - RGB Only (2 runs)
-- `scripts/train_a2_depth.py` - Depth Only (2 runs)
-- `scripts/train_b1_classification.py` - Classification (2 runs)
-
-**Evaluasi:**
-- `scripts/evaluate_all.py` - Semua model
-- `scripts/failure_analysis.py` - FP/FN
-
----
-
-## 🚀 CEPAT MULAI (Quick Start)
-
-### Langkah 0: Install Dependencies
+### Installation
 ```bash
+# Activate virtual environment
 .\venv\Scripts\Activate
-pip install ultralytics opencv-python numpy pandas matplotlib seaborn
+
+# Install core dependencies
+pip install ultralytics==8.3.0 opencv-python numpy pandas matplotlib seaborn
 ```
 
-### Langkah 1: Ekstrak Dataset
+## Dataset Preparation
+
+### 1. Extract Dataset
 ```bash
-# Ekstrak: Dataset\28574489.zip
-# Tujuan: Dataset\gohjinyu-oilpalm-ffb-dataset-d66eb99\
-# Pastikan ada folder:
-# - ffb-localization/rgb_images/
-# - ffb-localization/depth_maps/
+# Source
+Dataset\28574489.zip (4.3GB)
+
+# Destination
+Dataset\gohjinyu-oilpalm-ffb-dataset-d66eb99\
 ```
 
-### Langkah 2: Anotasi (Manual!)
-```bash
-# Buka AnyLabeling
-anylabeling
-
-# Atur:
-# - Output: Experiments/datasets/ffb_localization/labels/
-# - Input: Dataset/gohjinyu.../ffb-localization/rgb_images/
-# - Class: 1 class (fresh_fruit_bunch)
-# - Format: YOLO
-
-# Target: 300-500+ gambar teranotasi
+Required structure:
+```
+ffb-localization/
+├── rgb_images/
+├── depth_maps/
+└── point_clouds/
 ```
 
-### Langkah 3: Persiapan Data
+### 2. Manual Annotation
+Tool: AnyLabeling  
+Target: 300-500+ images minimum
+
+Configuration:
+- Input: Dataset/gohjinyu.../ffb-localization/rgb_images/
+- Output: Experiments/datasets/ffb_localization/labels/
+- Class: fresh_fruit_bunch (1 class)
+- Format: YOLO
+
+Quality Checklist:
+- All bounding boxes tight around fruit
+- Occluded fruits: annotate if >50% visible
+- Minimum 300 images with labels
+- Label files: .txt format, one per image
+
+## Experiment Phases
+
+### Phase 0: Data Analysis & Preparation
 ```bash
 cd Experiments\scripts
+
+# Step 1: EDA
 python simple_eda.py
+
+# Step 2: Split data 70:20:10
 python split_localization_data.py
+
+# Step 3: Process depth maps
 python prepare_depth_data.py
 ```
 
-### Langkah 4: Training
-```bash
-# A.1 RGB Only
-python train_a1_rgb.py
-
-# A.2 Depth Only  
-python train_a2_depth.py
-
-# B.1 Classification
-python train_b1_classification.py
+Output Structure:
+```
+Experiments/datasets/
+├── ffb_localization/          # RGB split
+├── ffb_localization_depth/    # Depth split
+└── depth_processed_rgb/       # 3-channel depth
 ```
 
-### Langkah 5: Evaluasi & Laporan
+### Phase 1: Experiment A.1 - RGB Baseline
+```bash
+# Training Run 1 (seed=42)
+python train_a1_rgb.py --run 1
+
+# Training Run 2 (seed=123)
+python train_a1_rgb.py --run 2
+```
+
+Config:
+- Model: YOLOv8n
+- Epochs: 50
+- Batch: 16
+- Image size: 640x640
+- Output: runs/detect/exp_a1_rgb_*
+
+### Phase 2: Experiment A.2 - Depth Only
+```bash
+# Training Run 1 (seed=42)
+python train_a2_depth.py --run 1
+
+# Training Run 2 (seed=123)
+python train_a2_depth.py --run 2
+```
+
+Config:
+- Model: YOLOv8n
+- Input: 3-channel depth (normalized 0-255)
+- Same hyperparameters as A.1
+- Output: runs/detect/exp_a2_depth_*
+
+### Phase 3: Experiment B.1 - Classification
+```bash
+# Training Run 1 (seed=42)
+python train_b1_classification.py --run 1
+
+# Training Run 2 (seed=123)
+python train_b1_classification.py --run 2
+```
+
+Config:
+- Model: YOLOv8n-cls
+- Classes: ripe_ffb, unripe_ffb
+- Epochs: 50
+- Batch: 32
+- Image size: 224x224
+- Output: runs/classify/exp_b1_cls_*
+
+## Evaluation & Reporting
+
+### Evaluate All Models
 ```bash
 python evaluate_all.py
-python failure_analysis.py
-
-# Hasil:
-# - Experiments/LAPORAN_EKSPERIMEN.md
-# - Experiments/failure_analysis/
 ```
 
----
+Generates:
+- LAPORAN_EKSPERIMEN.md
+- experiment_results.csv
+- Statistical analysis (mean, std dev)
 
-## 🧪 Eksperimen Yang Dijalankan
+### Failure Analysis
+```bash
+python failure_analysis.py
+```
 
-### A. Lokalisasi (Object Detection)
+Generates:
+- failure_analysis/ directory
+- False Positive visualizations
+- False Negative visualizations
+- Correct detection examples
+- Error analysis by conditions
 
-| # | Input | Model | Output |
-|---|-------|-------|--------|
-| **A.1** | RGB Only | YOLOv8n | Bounding Box |
-| **A.2** | Depth (3-ch) | YOLOv8n | Bounding Box |
-| **A.3** | RGB+Depth (4-ch) | YOLOv8n (modified) | Bounding Box |
+## Expected Results
 
-### B. Klasifikasi
+Target Metrics:
+- A.1 RGB: mAP50 0.70 - 0.85
+- A.2 Depth: mAP50 0.60 - 0.80
+- B.1 Cls: Top1 Acc 0.80 - 0.95
 
-| # | Input | Model | Output |
-|---|-------|-------|--------|
-| **B.1** | RGB Only | YOLOv8n-cls | Ripe vs Unripe |
-
-**Catatan:**
-- Setiap eksperimen: **2 kali training** (seed 42 & 123)
-- Total: **6 training runs** (3 eksperimen × 2 runs)
-
----
-
-## 📁 Struktur Folder
-
+Output Files Location:
 ```
 Experiments/
-├── 📄 EXPERIMENT_GUIDE_V2.md        # Panduan lengkap
-├── 📄 ffb_localization.yaml         # Config YOLO
-├── 📄 README.md                     # File ini
-│
-├── 📂 datasets/
-│   ├── ffb_localization/            # Split data RGB
-│   │   ├── images/{train,val,test}
-│   │   └── labels/{train,val,test}
-│   ├── ffb_localization_depth/      # Split data Depth (A.2)
-│   └── ffb_ripeness/                # Split data Classification (B.1)
-│
-├── 📂 scripts/
-│   ├── simple_eda.py
-│   ├── split_localization_data.py
-│   ├── prepare_depth_data.py
-│   ├── train_a1_rgb.py
-│   ├── train_a2_depth.py
-│   ├── train_b1_classification.py
-│   ├── evaluate_all.py
-│   ├── failure_analysis.py
-│   └── run_all_experiments.py       # Master script
-│
-├── 📂 runs/                          # Hasil training (auto-created)
-│   ├── detect/exp_a1_rgb_*/         # Model A.1
-│   ├── detect/exp_a2_depth_*/       # Model A.2
-│   └── classify/exp_b1_cls_*/       # Model B.1
-│
-└── 📂 failure_analysis/              # Hasil analisis (auto-created)
-    ├── false_positives/
-    ├── false_negatives/
-    └── correct_detections/
+├── runs/
+│   ├── detect/exp_a1_rgb_baseline/weights/best.pt
+│   ├── detect/exp_a2_depth_only/weights/best.pt
+│   └── classify/exp_b1_rgb_classification/weights/best.pt
+├── LAPORAN_EKSPERIMEN.md
+├── experiment_results.csv
+└── failure_analysis/
 ```
 
----
+## Execution Order Summary
 
-## 📊 Hasil Yang Diharapkan
+1. Extract Dataset\28574489.zip
+2. Annotate 300+ images (AnyLabeling)
+3. Run simple_eda.py
+4. Run split_localization_data.py
+5. Run prepare_depth_data.py
+6. Train A.1 RGB (2 runs)
+7. Train A.2 Depth (2 runs)
+8. Train B.1 Classification (2 runs)
+9. Run evaluate_all.py
+10. Run failure_analysis.py
 
-### Training Metrics (Target)
-- **A.1 RGB**: mAP50 ~0.7-0.85 (baseline)
-- **A.2 Depth**: mAP50 ~0.6-0.8 (tergantung kualitas depth)
-- **B.1 Cls**: Top1 Acc ~0.8-0.95
+## Configuration Files
 
-### Output Files
-1. **Model Weights** (`runs/*/weights/best.pt`)
-2. **Training Results** (`runs/*/results.png`)
-3. **Laporan** (`LAPORAN_EKSPERIMEN.md`)
-4. **Failure Analysis** (`failure_analysis/` + images)
-5. **CSV Results** (`experiment_results.csv`)
-
----
-
-## 🔧 Troubleshooting
-
-### ❌ "Dataset not found"
-```bash
-# Cek struktur folder
-ls Dataset\gohjinyu-oilpalm-ffb-dataset-d66eb99\ffb-localization\
-# Harus ada: rgb_images/ depth_maps/
+ffb_localization.yaml:
+```yaml
+path: D:/Work/Assisten Dosen/Anylabel/Experiments/datasets/ffb_localization
+train: images/train
+val: images/val
+test: images/test
+nc: 1
+names: ['fresh_fruit_bunch']
 ```
 
-### ❌ "CUDA out of memory"
-```bash
-# Edit config, turunkan batch size
-batch: 8  # atau 4
-# atau gunakan CPU
-device: cpu
-```
+## Troubleshooting
 
-### ❌ "No labels found"
-```bash
-# Pastikan anotasi selesai di AnyLabeling
-# Cek jumlah file .txt vs jumlah gambar
-```
+CUDA Out of Memory:
+- Edit training script: reduce batch size (8 or 4)
+- Or use CPU: device: cpu
 
-### ❌ Training lama
-```bash
-# Gunakan GPU! (10x lebih cepat)
-device: 0
+No Labels Found:
+- Verify annotation count matches images
+- Check Experiments/datasets/ffb_localization/labels/train
 
-# Turunkan epochs untuk test
-epochs: 10  # bukan 50
-```
+Training Too Slow:
+- Use GPU (device: 0)
+- Ensure CUDA installed
 
----
+## File Reference
 
-## 📚 Referensi
+| File | Purpose |
+|------|---------|
+| EXPERIMENT_GUIDE_V2.md | Detailed Indonesian guide |
+| ffb_localization.yaml | YOLO dataset config |
+| scripts/simple_eda.py | Dataset analysis |
+| scripts/split_localization_data.py | Train/Val/Test split |
+| scripts/prepare_depth_data.py | Depth normalization |
+| scripts/train_a1_rgb.py | RGB training |
+| scripts/train_a2_depth.py | Depth training |
+| scripts/train_b1_classification.py | Classification training |
+| scripts/evaluate_all.py | Metrics & reporting |
+| scripts/failure_analysis.py | Visual error analysis |
 
-### Dokumentasi
-- **YOLOv8**: https://docs.ultralytics.com/
-- **AnyLabeling**: https://github.com/vietanhdev/anylabeling
-- **Dataset**: `Dataset\dataset Goh 2025.md`
+## Notes
 
-### Tools
-- **Annotasi**: AnyLabeling
-- **Training**: Ultralytics YOLO
-- **Analysis**: OpenCV, Pandas, Matplotlib
-
----
-
-## 👥 Tim
-- **Dosen Pembimbing**: [Nama Dosen]
-- **Asisten Dosen**: Anda
-- **AI Assistant**: Factory Droid
+- All experiments use seeds 42 and 123 for reproducibility
+- Depth maps normalized from 0.6m-6m to 0-255 range
+- Training logs saved to runs/ directory
+- Evaluation generates statistical analysis
+- Failure analysis creates visual reports
 
 ---
-
-## 🎯 Checklist Sebelum Training
-
-- [ ] Dataset terextract (4.3GB zip)
-- [ ] Python dependencies terinstall
-- [ ] Anotasi selesai (300+ gambar)
-- [ ] Run `simple_eda.py` ✅
-- [ ] Run `split_localization_data.py` ✅
-- [ ] Run `prepare_depth_data.py` ✅
-- [ ] Config `ffb_localization.yaml` ada ✅
-- [ ] GPU tersedia (opsional, tapi recommended)
-- [ ] Disk space cukup (~10GB)
-
----
-
-## 💡 Tips
-
-1. **Mulai dari A.1** (RGB Only) dulu sebagai baseline
-2. **Gunakan GPU** untuk training cepat
-3. **Cek results.png** di folder runs/ untuk lihat learning curve
-4. **Simpan weights terbaik** setiap eksperimen
-5. **Jangan lupa seed berbeda** (42 & 123) untuk validasi
-
----
-
-**Last Updated:** 2026-01-15  
-**Status:** Ready to Use 🚀
+**Reference:** EXPERIMENT_GUIDE_V2.md (Indonesian, detailed)

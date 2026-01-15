@@ -36,7 +36,7 @@ SEEDS = [42, 123]
 def prepare_depth_dataset():
     """Copy depth images to replace RGB images in train/val/test folders"""
     
-    print("📁 Menyiapkan dataset depth...")
+    print("Menyiapkan dataset depth...")
     
     # Create depth dataset structure
     for split in ['train', 'val', 'test']:
@@ -47,13 +47,9 @@ def prepare_depth_dataset():
     depth_images = glob.glob(os.path.join(DEPTH_SOURCE, "*.png"))
     
     if not depth_images:
-        print(f"❌ Tidak ada depth images di {DEPTH_SOURCE}")
+        print(f"Dataset depth tidak ada di {DEPTH_SOURCE}")
         print("   Jalankan prepare_depth_data.py terlebih dahulu!")
         return False
-    
-    # Copy depth images to corresponding folders
-    # Asumsi: File di depth_processed_rgb sudah siap
-    # Perlu mapping filename ke split (train/val/test)
     
     # Cek mapping dari dataset asli
     original_splits = {
@@ -83,9 +79,9 @@ def prepare_depth_dataset():
                 if os.path.exists(label_src):
                     shutil.copy2(label_src, label_dest)
             else:
-                print(f"  ⚠️ Warning: Depth file not found for {filename}")
+                print(f"  Warning: Depth file not found for {filename}")
     
-    print("✅ Dataset depth siap!")
+    print("Dataset depth siap!")
     return True
 
 def create_depth_config():
@@ -107,7 +103,7 @@ names: ['fresh_fruit_bunch']
     with open(config_path, 'w') as f:
         f.write(config_content)
     
-    print(f"✅ Config depth created: {config_path}")
+    print(f"Config depth created: {config_path}")
     return config_path
 
 def train_with_seed(seed):
@@ -124,7 +120,7 @@ def train_with_seed(seed):
         yaml.dump(config, f, default_flow_style=False)
     
     print(f"\n{'='*60}")
-    print(f"🚀 TRAINING A.2 DEPTH ONLY - Seed {seed}")
+    print(f"TRAINING A.2 DEPTH ONLY - Seed {seed}")
     print(f"{'='*60}")
     print(f"Config: {config_path}")
     print(f"Output: runs/detect/{config['name']}")
@@ -134,14 +130,14 @@ def train_with_seed(seed):
     
     try:
         subprocess.run(command, shell=True, check=True)
-        print(f"✅ Training completed for seed {seed}")
+        print(f"Training completed for seed {seed}")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Training failed for seed {seed}: {e}")
+        print(f"Training failed for seed {seed}: {e}")
         return False
 
 def main():
-    print("🔬 Eksperimen A.2: Depth Only")
+    print("Eksperimen A.2: Depth Only")
     print("="*60)
     
     # Step 1: Prepare depth dataset
@@ -159,17 +155,17 @@ def main():
     
     # Summary
     print("\n" + "="*60)
-    print("📊 RINGKASAN EKSEKUSI")
+    print("RINGKASAN EKSEKUSI")
     print("="*60)
     for seed, success in results:
-        status = "✅ BERHASIL" if success else "❌ GAGAL"
+        status = "BERHASIL" if success else "GAGAL"
         print(f"Seed {seed}: {status}")
     
-    print("\n📁 Hasil training:")
+    print("\nHasil training:")
     for seed in SEEDS:
         print(f"  - Seed {seed}: runs/detect/exp_a2_depth_seed_{seed}/")
     
-    print("\n💡 Untuk evaluasi:")
+    print("\nUntuk evaluasi:")
     print("  yolo detect val model=runs/detect/exp_a2_depth_seed_42/weights/best.pt data=ffb_localization_depth.yaml split=test")
 
 if __name__ == "__main__":

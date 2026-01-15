@@ -35,8 +35,8 @@ def check_classification_dataset():
     dataset_path = os.path.join(DATASET_DIR, "ffb_ripeness")
     
     if not os.path.exists(dataset_path):
-        print(f"❌ Dataset klasifikasi tidak ditemukan: {dataset_path}")
-        print("\n📂 Struktur yang dibutuhkan:")
+        print(f"Dataset klasifikasi tidak ditemukan: {dataset_path}")
+        print("\nStruktur yang dibutuhkan:")
         print(f"   {dataset_path}/")
         print(f"   ├── images/train/ripe/")
         print(f"   ├── images/train/unripe/")
@@ -51,10 +51,10 @@ def check_classification_dataset():
         for class_name in ['ripe', 'unripe']:
             path = os.path.join(dataset_path, 'images', split, class_name)
             if not os.path.exists(path):
-                print(f"⚠️ Folder tidak ada: {path}")
+                print(f"Folder tidak ada: {path}")
                 return False
     
-    print("✅ Dataset klasifikasi ditemukan!")
+    print("Dataset klasifikasi ditemukan!")
     return True
 
 def create_classification_config():
@@ -76,7 +76,7 @@ names: ['ripe_ffb', 'unripe_ffb']
     with open(config_path, 'w') as f:
         f.write(config_content)
     
-    print(f"✅ Config klasifikasi created: {config_path}")
+    print(f"Config klasifikasi created: {config_path}")
     return config_path
 
 def train_with_seed(seed):
@@ -93,7 +93,7 @@ def train_with_seed(seed):
         yaml.dump(config, f, default_flow_style=False)
     
     print(f"\n{'='*60}")
-    print(f"🚀 TRAINING B.1 CLASSIFICATION - Seed {seed}")
+    print(f"TRAINING B.1 CLASSIFICATION - Seed {seed}")
     print(f"{'='*60}")
     print(f"Config: {config_path}")
     print(f"Output: runs/classify/{config['name']}")
@@ -105,19 +105,19 @@ def train_with_seed(seed):
     
     try:
         subprocess.run(command, shell=True, check=True)
-        print(f"✅ Training completed for seed {seed}")
+        print(f"Training completed for seed {seed}")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Training failed for seed {seed}: {e}")
+        print(f"Training failed for seed {seed}: {e}")
         return False
 
 def main():
-    print("🔬 Eksperimen B.1: Classification (RGB Only)")
+    print("Eksperimen B.1: Classification (RGB Only)")
     print("="*60)
     
     # Check dataset
     if not check_classification_dataset():
-        print("\n💡 Solusi:")
+        print("\nSolusi:")
         print("   - Siapkan dataset ripeness di Experiments/datasets/ffb_ripeness/")
         print("   - Atau gunakan script lain untuk prepare data")
         return
@@ -133,17 +133,17 @@ def main():
     
     # Summary
     print("\n" + "="*60)
-    print("📊 RINGKASAN EKSEKUSI")
+    print("RINGKASAN EKSEKUSI")
     print("="*60)
     for seed, success in results:
-        status = "✅ BERHASIL" if success else "❌ GAGAL"
+        status = "BERHASIL" if success else "GAGAL"
         print(f"Seed {seed}: {status}")
     
-    print("\n📁 Hasil training:")
+    print("\nHasil training:")
     for seed in SEEDS:
         print(f"  - Seed {seed}: runs/classify/exp_b1_cls_seed_{seed}/")
     
-    print("\n💡 Untuk evaluasi:")
+    print("\nUntuk evaluasi:")
     print("  yolo classify val model=runs/classify/exp_b1_cls_seed_42/weights/best.pt data=ffb_ripeness.yaml split=test")
 
 if __name__ == "__main__":

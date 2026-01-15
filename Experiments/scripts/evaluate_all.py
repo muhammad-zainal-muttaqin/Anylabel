@@ -32,10 +32,10 @@ def evaluate_model(name, model_path, dataset_config, task='detect'):
     full_data_path = os.path.join(EXPERIMENTS_DIR, dataset_config)
     
     if not os.path.exists(full_model_path):
-        print(f"⚠️ Model not found: {full_model_path}")
+        print(f"Model not found: {full_model_path}")
         return None
     
-    print(f"🔍 Evaluating: {name}")
+    print(f"Evaluating: {name}")
     
     try:
         model = YOLO(full_model_path)
@@ -61,7 +61,7 @@ def evaluate_model(name, model_path, dataset_config, task='detect'):
             }
             
     except Exception as e:
-        print(f"❌ Error evaluating {name}: {e}")
+        print(f"Error evaluating {name}: {e}")
         return None
 
 def calculate_statistics(results_dict):
@@ -102,8 +102,8 @@ def calculate_statistics(results_dict):
 def generate_report(results_dict, stats):
     """Generate comprehensive report"""
     
-    report = "# 📊 LAPORAN EKSPERIMEN DETEKSI TBS\n\n"
-    report += "## 📈 Hasil Per Run\n\n"
+    report = "# LAPORAN EKSPERIMEN DETEKSI TBS\n\n"
+    report += "## Hasil Per Run\n\n"
     
     # Per-run results
     report += "| Eksperimen | mAP50 | mAP50-95 | Precision | Recall | Fitness |\n"
@@ -111,7 +111,7 @@ def generate_report(results_dict, stats):
     
     for name, metrics in results_dict.items():
         if metrics is None:
-            report += f"| {name} | ❌ | ❌ | ❌ | ❌ | ❌ |\n"
+            report += f"| {name} | FAIL | FAIL | FAIL | FAIL | FAIL |\n"
         else:
             report += f"| {name} | {metrics.get('mAP50', metrics.get('Top1_Acc', 'N/A')):.4f} | "
             report += f"{metrics.get('mAP50-95', metrics.get('Top5_Acc', 'N/A')):.4f} | "
@@ -119,7 +119,7 @@ def generate_report(results_dict, stats):
             report += f"{metrics['Fitness']:.4f} |\n"
     
     # Statistics
-    report += "\n## 📊 Statistik (Mean ± Std)\n\n"
+    report += "\n## Statistik (Mean ± Std)\n\n"
     
     for exp_name, data in stats.items():
         report += f"### {exp_name}\n"
@@ -132,7 +132,7 @@ def generate_report(results_dict, stats):
         report += "\n"
     
     # Comparison
-    report += "## 🏆 Perbandingan Eksperimen\n\n"
+    report += "## Perbandingan Eksperimen\n\n"
     
     # Find best mAP per experiment type
     experiment_types = {}
@@ -169,10 +169,10 @@ def save_results_to_csv(results_dict, filename):
     if df_data:
         df = pd.DataFrame(df_data)
         df.to_csv(filename, index=False)
-        print(f"✅ Results saved to {filename}")
+        print(f"Results saved to {filename}")
 
 def main():
-    print("🔬 Mengevaluasi Semua Eksperimen")
+    print("Mengevaluasi Semua Eksperimen")
     print("="*60)
     
     results = {}
@@ -190,7 +190,7 @@ def main():
         elif 'Cls' in name:
             dataset = DATASETS['classify']
         else:
-            print(f"⚠️ Unknown dataset for {name}")
+            print(f"Unknown dataset for {name}")
             continue
         
         result = evaluate_model(name, model_path, dataset, task)
@@ -212,14 +212,17 @@ def main():
     save_results_to_csv(results, csv_path)
     
     print("\n" + "="*60)
-    print("✅ EVALUASI SELESAI")
+    print("EVALUASI SELESAI")
     print("="*60)
-    print(f"📄 Report: {report_path}")
-    print(f"📊 CSV: {csv_path}")
-    print("\n💡 Catatan:")
+    print(f"Report: {report_path}")
+    print(f"CSV: {csv_path}")
+    print("\nCatatan:")
     print("   - Pastikan semua model sudah dilatih sebelum evaluasi")
     print("   - Jika ada 'Model not found', jalankan training terlebih dahulu")
     print("   - Cek 'runs/' folder untuk hasil training")
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     main()

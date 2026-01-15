@@ -43,7 +43,7 @@ def train_with_seed(seed):
         yaml.dump(config, f, default_flow_style=False)
     
     print(f"\n{'='*60}")
-    print(f"🚀 TRAINING A.1 RGB - Seed {seed}")
+    print(f"TRAINING A.1 RGB - Seed {seed}")
     print(f"{'='*60}")
     print(f"Config: {config_path}")
     print(f"Output: runs/detect/{config['name']}")
@@ -54,28 +54,28 @@ def train_with_seed(seed):
     
     try:
         result = subprocess.run(command, shell=True, check=True)
-        print(f"✅ Training completed for seed {seed}")
+        print(f"Training completed for seed {seed}")
     except subprocess.CalledProcessError as e:
-        print(f"❌ Training failed for seed {seed}: {e}")
+        print(f"Training failed for seed {seed}: {e}")
         return False
     
     return True
 
 def main():
-    print("🔬 Eksperimen A.1: RGB Only (Baseline)")
+    print("Eksperimen A.1: RGB Only (Baseline)")
     print("="*60)
     
     # Check if dataset exists
     dataset_path = os.path.join(CONFIG_DIR, "datasets", "ffb_localization")
     if not os.path.exists(dataset_path):
-        print(f"❌ Dataset tidak ditemukan: {dataset_path}")
+        print(f"Dataset tidak ditemukan: {dataset_path}")
         print("   Jalankan split_localization_data.py terlebih dahulu!")
         return
     
     # Check if config file exists
     config_file = os.path.join(CONFIG_DIR, "ffb_localization.yaml")
     if not os.path.exists(config_file):
-        print(f"❌ Config dataset tidak ditemukan: {config_file}")
+        print(f"Config dataset tidak ditemukan: {config_file}")
         print("   Pastikan ffb_localization.yaml sudah dibuat!")
         return
     
@@ -87,18 +87,18 @@ def main():
     
     # Summary
     print("\n" + "="*60)
-    print("📊 RINGKASAN EKSEKUSI")
+    print("RINGKASAN EKSEKUSI")
     print("="*60)
     for seed, success in results:
-        status = "✅ BERHASIL" if success else "❌ GAGAL"
+        status = "BERHASIL" if success else "GAGAL"
         print(f"Seed {seed}: {status}")
     
     # Show results location
-    print("\n📁 Hasil training:")
+    print("\nHasil training:")
     for seed in SEEDS:
         print(f"  - Seed {seed}: runs/detect/exp_a1_rgb_seed_{seed}/")
     
-    print("\n💡 Untuk evaluasi, jalankan:")
+    print("\nUntuk evaluasi, jalankan:")
     print("  cd Experiments")
     print("  yolo detect val model=runs/detect/exp_a1_rgb_seed_42/weights/best.pt data=ffb_localization.yaml split=test")
 
