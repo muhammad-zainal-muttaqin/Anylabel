@@ -1,0 +1,22 @@
+# Dataset Configuration for FFB Localization
+# Path: Experiments/ffb_localization.yaml
+
+path: D:/Work/Assisten Dosen/Anylabel/Experiments/datasets/ffb_localization
+train: images/train
+val: images/val
+test: images/test
+
+# Number of classes
+nc: 1
+
+# Class names
+names: ['fresh_fruit_bunch']
+
+# Optional: Class weights (if needed for imbalance)
+# weights: [1.0]
+
+# Optional: Image size (default: 640)
+# imgsz: 640
+
+# Optional: Batch size (can be set here or in training config)
+# batch: 16

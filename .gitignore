@@ -1,3 +1,11 @@
+# Dataset (large files)
+Dataset/
+
+# Experiments Results (auto-generated)
+Experiments/datasets/
+Experiments/runs/
+Experiments/failure_analysis/
+
 # Virtual Environment
 venv/
 anylabeling-env/
