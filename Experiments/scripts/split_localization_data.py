@@ -2,16 +2,14 @@ import os
 import shutil
 import random
 import glob
-from pathlib import Path
 
 # --- KONFIGURASI ---
 # Folder sumber dataset (sesuaikan jika lokasi berubah)
 SOURCE_DATASET_DIR = r"D:\Work\Assisten Dosen\Anylabel\Dataset\gohjinyu-oilpalm-ffb-dataset-d66eb99\ffb-localization"
 SOURCE_IMAGES_DIR = os.path.join(SOURCE_DATASET_DIR, "rgb_images")
-SOURCE_LABELS_DIR = os.path.join(SOURCE_DATASET_DIR, "labels_yolo") # Asumsi folder label ada di sini
-
-# Folder tujuan untuk siap training (YOLO Struct)
 OUTPUT_BASE_DIR = r"D:\Work\Assisten Dosen\Anylabel\Experiments\datasets\ffb_localization"
+LABELS_ALL_DIR = os.path.join(OUTPUT_BASE_DIR, "labels_all")
+SOURCE_LABELS_DIRS = [LABELS_ALL_DIR, os.path.join(SOURCE_DATASET_DIR, "labels_yolo")]
 
 # Rasio pembagian
 TRAIN_RATIO = 0.7
@@ -26,6 +24,7 @@ def setup_directories():
     for split in ['train', 'val', 'test']:
         os.makedirs(os.path.join(OUTPUT_BASE_DIR, 'images', split), exist_ok=True)
         os.makedirs(os.path.join(OUTPUT_BASE_DIR, 'labels', split), exist_ok=True)
+    os.makedirs(LABELS_ALL_DIR, exist_ok=True)
     print(f"Folder struktur dibuat di: {OUTPUT_BASE_DIR}")
 
 def split_dataset():
@@ -66,8 +65,12 @@ def split_dataset():
             filename = os.path.basename(img_path)
             basename = os.path.splitext(filename)[0]
             
-            # Path Label (Asumsi format .txt)
-            label_path = os.path.join(SOURCE_LABELS_DIR, basename + ".txt")
+            label_path = None
+            for label_dir in SOURCE_LABELS_DIRS:
+                candidate = os.path.join(label_dir, basename + ".txt")
+                if os.path.exists(candidate):
+                    label_path = candidate
+                    break
 
             # Destination Paths
             dest_img_path = os.path.join(OUTPUT_BASE_DIR, 'images', split_name, filename)
@@ -77,7 +80,7 @@ def split_dataset():
             shutil.copy2(img_path, dest_img_path)
 
             # Copy Label (Jika ada)
-            if os.path.exists(label_path):
+            if label_path and os.path.exists(label_path):
                 shutil.copy2(label_path, dest_label_path)
             else:
                 # Warning kalau label ga ada (normal jika belum anotasi semua)
@@ -92,8 +95,13 @@ def split_dataset():
     print(f"Lokasi: {OUTPUT_BASE_DIR}")
 
 if __name__ == "__main__":
-    if not os.path.exists(SOURCE_LABELS_DIR):
-        print(f"Peringatan: Folder label belum ada di '{SOURCE_LABELS_DIR}'")
+    has_any_labels = False
+    for label_dir in SOURCE_LABELS_DIRS:
+        if os.path.exists(label_dir) and glob.glob(os.path.join(label_dir, "*.txt")):
+            has_any_labels = True
+            break
+    if not has_any_labels:
+        print("Peringatan: Folder label belum ada atau masih kosong.")
         print("Script ini tetap akan jalan mengcopy gambar, tapi tanpa label.")
         print("Pastikan Anda sudah melakukan anotasi (Tahap 1.1) sebelum training serius.")
     

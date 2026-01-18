@@ -1,16 +1,25 @@
-# Eksperimen Deteksi Tandan Buah Segar (TBS) Kelapa Sawit
-**Versi 2.0 - Panduan Lengkap Step-by-Step**
+# Eksperimen Deteksi TBS & Klasifikasi Kematangan Sawit
+**Versi 2.2 - Panduan Ringkas (sesuai rencana eksperimen)**
 
 ---
 
 ## Ringkasan Eksperimen
 
-| Eksperimen | Input | Model | Target | Output |
-|------------|-------|-------|--------|--------|
-| **A.1** | RGB Only | YOLOv8n | Object Detection | Bounding Box TBS |
-| **A.2** | Depth Only (3-channel) | YOLOv8n | Object Detection | Bounding Box TBS |
-| **A.3** | RGB + Depth (4-channel) | YOLOv8n (modified) | Object Detection | Bounding Box TBS |
-| **B.1** | RGB Only | YOLOv8n-cls | Classification | Ripe vs Unripe |
+| Eksperimen | Input | Model (Baseline) | Target | Output |
+|------------|-------|------------------|--------|--------|
+| **A.1** | RGB | **YOLO11n** | Object Detection | Bounding Box TBS |
+| **A.2** | Depth (3-channel) | **YOLO11n** | Object Detection | Bounding Box TBS |
+| **A.3 (opsional)** | RGB+Depth (4-ch) | **Custom** | Object Detection | Bounding Box TBS |
+| **B.1** | RGB | **YOLO11n-cls** | Classification (2 kelas: ripe/unripe) | Label kematangan |
+
+### Keputusan Model (Disarankan)
+- **Model (baseline)**: **YOLO11n atau YOLOv8n**. Gunakan YOLO11 sebagai baseline bila tidak ada alasan khusus memakai YOLOv8.
+- **Target deploy mobile (kandidat)**: **YOLO26** (utamanya varian `n`) untuk uji latensi end-to-end di perangkat.
+- **Catatan penting**: beberapa laporan menunjukkan **YOLO26 (NMS-free head)** bisa butuh **epoch lebih tinggi** agar menyamai YOLO11 pada dataset yang tidak terlalu besar. Untuk baseline cepat, mulai dari YOLO11 dulu.
+
+### Ruang Lingkup Eksperimen
+- **A (Lokalisasi)**: single-class (TBS), jalankan RGB-only, Depth-only (replikasi 1→3), lalu RGB+Depth (4 channel).
+- **B (Klasifikasi)**: **2 kelas (ripe/unripe)**, RGB-only pakai dataset classification.
 
 ---
 
@@ -83,7 +92,7 @@ python simple_eda.py
 ### 1.2. Anotasi Klasifikasi (Jika Diperlukan)
 Jika dataset klasifikasi (`ffb-ripeness-classification`) belum ada:
 - Kumpulkan data terpisah
-- Anotasi dengan kelas: `ripe_ffb` dan `unripe_ffb`
+- Siapkan label **2 kelas**: `ripe` dan `unripe` (atau gunakan nama folder yang Anda pakai), dan pastikan konsisten dari awal
 
 ---
 
@@ -156,7 +165,7 @@ names: ['fresh_fruit_bunch']
 ```yaml
 task: detect
 mode: train
-model: yolov8n.pt
+model: yolo11n.pt
 data: ffb_localization.yaml
 epochs: 50
 patience: 10
@@ -169,6 +178,10 @@ project: runs/detect
 name: exp_a1_rgb_baseline
 seed: 42
 ```
+
+**Opsi deploy mobile (uji banding):**
+- Ganti `model: yolo11n.pt` → `model: yolo26n.pt`
+- Jika hasil YOLO26 lebih rendah, coba **naikkan epoch** (mis. 100) sebelum menyimpulkan.
 
 #### Step 2: Training (Run #1)
 ```bash
@@ -221,7 +234,7 @@ names: ['fresh_fruit_bunch']
 ```yaml
 task: detect
 mode: train
-model: yolov8n.pt
+model: yolo11n.pt
 data: ffb_localization_depth.yaml
 epochs: 50
 patience: 10
@@ -248,95 +261,31 @@ yolo detect train config=config_a2_depth.yaml
 
 ### **Eksperimen A.3: RGB + Depth (4-Channel)**
 
-**Tantangan:** Modifikasi model YOLO untuk menerima 4 channel input.
+**Status:** opsional (lanjutkan setelah A.1/A.2 stabil).
 
-#### Opsi 1: Modifikasi Model dari Awal (Recommended untuk eksperimen)
-**File:** `Experiments/model_4channel.py`
-```python
-import torch
-import torch.nn as nn
-from ultralytics import YOLO
+**Tujuan:** menguji apakah depth membantu jika digabung dengan RGB (input 4 channel).
 
-class YOLO4Channel(YOLO):
-    def __init__(self, model='yolov8n.pt', ch=4):
-        super().__init__(model)
-        # Modifikasi first layer untuk 4 channel
-        self.model[0].conv1 = nn.Conv2d(
-            ch, 16, kernel_size=3, stride=2, padding=1, bias=False
-        )
-        # Load weights untuk layer lainnya (transfer learning)
-        # Note: First layer weights perlu diisi manual atau training dari scratch
+**Ringkas langkahnya:**
+1. Buat dataset 4-channel (gabungkan RGB + depth menjadi `[R,G,B,D]`).
+2. Modifikasi layer input pertama model agar menerima 4 channel.
+3. Train + evaluasi seperti A.1.
 
-# Usage:
-# model = YOLO4Channel('yolov8n.pt')
-# model.train(data='ffb_localization_4ch.yaml', epochs=50, ...)
-```
-
-#### Opsi 2: Stack RGB+Depth sebagai Video (Sederhana)
-- Buat data input dengan channel 4: [R, G, B, D]
-- Atau: 2 frame [RGB, Depth] sebagai sequence
-
-#### Opsi 3: Fusion Model (Advanced)
-- Separate branches untuk RGB dan Depth
-- Fusion layer di tengah
-
-#### Config untuk 4-Channel:
-**File:** `Experiments/ffb_localization_4ch.yaml`
-```yaml
-path: D:/Work/Assisten Dosen/Anylabel/Experiments/datasets/ffb_localization_4ch
-train: images/train
-val: images/val
-test: images/test
-
-nc: 1
-names: ['fresh_fruit_bunch']
-
-# Tambahan untuk custom model
-custom_input_channels: 4
-```
-
-**Data Preparation:**
-```python
-# Buat script untuk stack RGB + Depth menjadi 4-channel
-# Experiments/scripts/prepare_4ch_data.py
-
-import cv2
-import numpy as np
-import os
-
-def create_4channel(rgb_path, depth_path, output_path):
-    rgb = cv2.imread(rgb_path)
-    depth = cv2.imread(depth_path, cv2.IMREAD_GRAYSCALE)
-    
-    # Stack menjadi 4 channel
-    # Channel terakhir = depth
-    if len(rgb.shape) == 2:
-        rgb = cv2.cvtColor(rgb, cv2.COLOR_GRAY2BGR)
-    
-    b, g, r = cv2.split(rgb)
-    four_channel = cv2.merge([b, g, r, depth])
-    
-    # Simpan sebagai PNG dengan 4 channel
-    cv2.imwrite(output_path, four_channel)
-
-# Jalankan untuk semua data
-```
+**Catatan:** ini pekerjaan “custom” (tidak drop-in seperti A.1/A.2), jadi jangan dijadikan baseline awal.
 
 ---
 
 ## FASE 4: Eksperimen B - Klasifikasi
 
-### **Eksperimen B.1: RGB Only (2-Class: Ripe vs Unripe)**
+### **Eksperimen B.1: RGB Only (2 Kelas: ripe/unripe)**
 
 #### Step 1: Siapkan Dataset Klasifikasi
 - Dataset: `ffb-ripeness-classification`
 - Struktur: `images/ripe/`, `images/unripe/`
+- Pastikan penamaan folder dan label konsisten.
 
 #### Step 2: Split Data Klasifikasi
-```python
-# Experiments/scripts/split_classification_data.py
-# Split 70:20:10 untuk ripe dan unripe
-```
+- Split **70/20/10** dengan **stratified per kelas** (jaga proporsi `ripe`/`unripe`).
+- Jika perlu otomatisasi, buat script `Experiments/scripts/split_classification_data.py` (opsional).
 
 #### Step 3: Dataset Config
 **File:** `Experiments/ffb_ripeness.yaml`
@@ -347,7 +296,7 @@ val: images/val
 test: images/test
 
 nc: 2
-names: ['ripe_ffb', 'unripe_ffb']
+names: ['ripe', 'unripe']
 ```
 
 #### Step 4: Setup Config
@@ -355,7 +304,7 @@ names: ['ripe_ffb', 'unripe_ffb']
 ```yaml
 task: classify
 mode: train
-model: yolov8n-cls.pt
+model: yolo11n-cls.pt
 data: ffb_ripeness.yaml
 epochs: 50
 patience: 10
@@ -368,6 +317,10 @@ project: runs/classify
 name: exp_b1_rgb_classification
 seed: 42
 ```
+
+**Opsi deploy mobile (uji banding):**
+- Ganti `model: yolo11n-cls.pt` → `model: yolo26n-cls.pt`
+- Jika kelas tidak seimbang, prioritaskan perbaikan data/sampling dulu sebelum ganti model.
 
 #### Step 5: Training (Run #1 & #2)
 ```bash
@@ -385,46 +338,30 @@ yolo classify train config=config_b1_cls.yaml
 ### 5.1. Evaluasi Semua Model
 **Script:** `Experiments/scripts/evaluate_all.py`
 
-```python
-from ultralytics import YOLO
-import os
+Jalankan:
 
-def evaluate_model(model_path, data_config, task='detect'):
-    model = YOLO(model_path)
-    results = model.val(data=data_config, task=task)
-    
-    return {
-        'mAP50': results.box.map50 if task == 'detect' else results.top1,
-        'mAP50-95': results.box.map if task == 'detect' else results.top5,
-        'precision': results.box.mp,
-        'recall': results.box.mr
-    }
-
-# Evaluasi semua eksperimen
-experiments = {
-    'A.1 RGB': ('runs/detect/exp_a1_rgb_baseline/weights/best.pt', 'ffb_localization.yaml'),
-    'A.2 Depth': ('runs/detect/exp_a2_depth_only/weights/best.pt', 'ffb_localization_depth.yaml'),
-    'B.1 Cls': ('runs/classify/exp_b1_rgb_classification/weights/best.pt', 'ffb_ripeness.yaml', 'classify'),
-}
-
-results = {}
-for name, (model, data, *task) in experiments.items():
-    t = task[0] if task else 'detect'
-    results[name] = evaluate_model(model, data, t)
-
-# Save to CSV
-import pandas as pd
-pd.DataFrame(results).to_csv('experiment_results.csv')
+```bash
+cd Experiments\scripts
+python evaluate_all.py
 ```
+
+Output:
+- File ringkasan metrik (CSV), mis. `experiment_results.csv`
+- Pastikan path weights dan file dataset YAML di dalam script sudah sesuai folder `runs/` Anda
 
 ### 5.2. Analisis Kegagalan
 **Script:** `Experiments/scripts/failure_analysis.py`
 
-```python
-# Cari False Positive, False Negative
-# Visualisasi: Gambar asli + prediksi + ground truth
-# Analisis: Pencahayaan, ukuran, occlusion
+Jalankan:
+
+```bash
+cd Experiments\scripts
+python failure_analysis.py
 ```
+
+Fokus analisis:
+- False Positive / False Negative
+- Kondisi sulit: pencahayaan, occlusion, ukuran objek, blur
 
 ### 5.3. Report Template
 **File:** `Experiments/LAPORAN_HASIL.md`
@@ -470,6 +407,7 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 - [ ] Config: `config_a1_rgb.yaml` (seed 123)
 - [ ] Training Run #2
 - [ ] Eval & Save metrics
+- [ ] (Opsional) Uji `yolo26n.pt` untuk kandidat deploy mobile + epoch lebih tinggi bila perlu
 
 ### Tahap 5: Eksperimen A.2 (Depth Only)
 - [ ] Prepare depth data
@@ -481,11 +419,9 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 - [ ] Eval & Save metrics
 
 ### Tahap 6: Eksperimen A.3 (RGB+Depth 4-ch)
-- [ ] Create `prepare_4ch_data.py`
-- [ ] Generate 4-channel dataset
-- [ ] Modifikasi model
-- [ ] Training 2x runs
-- [ ] Eval & Save metrics
+- [ ] (Opsional) Siapkan dataset 4-channel (RGB+Depth)
+- [ ] (Opsional) Modifikasi model untuk input 4 channel
+- [ ] (Opsional) Training 2x runs + evaluasi
 
 ### Tahap 7: Eksperimen B.1 (Classification)
 - [ ] Prepare classification dataset
@@ -495,6 +431,7 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 - [ ] Config: `config_b1_cls.yaml` (seed 123)
 - [ ] Training Run #2
 - [ ] Eval & Save metrics
+- [ ] (Opsional) Uji `yolo26n-cls.pt` untuk kandidat deploy mobile
 
 ### Tahap 8: Reporting
 - [ ] Run `evaluate_all.py`
@@ -530,8 +467,8 @@ pd.DataFrame(results).to_csv('experiment_results.csv')
 - Install: `pip install ultralytics opencv-python`
 
 ### Training lama
-- Gunakan model nano: `yolov8n.pt` (bukan yolov8m/l/x)
-- Turunkan epochs: `epochs: 30` (untuk testing)
+- Gunakan model nano: `yolo11n.pt` / `yolo26n.pt` (bukan varian m/l/x)
+- Untuk uji cepat, turunkan epochs (mis. 30). Untuk hasil serius, kembali ke epoch rekomendasi di config.
 - Gunakan GPU!
 
 ---
