@@ -1,0 +1,45 @@
+# Requirements for Oil Palm FFB Detection & Classification Experiments
+# Python >= 3.10 (recommended: 3.12)
+# Last Updated: 2026-01-18
+
+# ============================================
+# Core ML & Computer Vision Libraries
+# ============================================
+ultralytics>=8.3.0,<9.0.0
+opencv-python>=4.6.0,<5.0.0
+numpy>=1.23.0,<2.0.0
+pillow>=7.1.2
+
+# ============================================
+# Data Processing & Analysis
+# ============================================
+pandas>=1.5.0
+matplotlib>=3.3.0
+seaborn>=0.12.0
+
+# ============================================
+# Annotation Tool
+# ============================================
+# For CPU-only: use 'anylabeling'
+# For GPU support: use 'anylabeling-gpu' instead
+anylabeling>=0.4.0
+
+# ============================================
+# Configuration & Utilities
+# ============================================
+pyyaml>=5.3.1
+requests>=2.23.0
+scipy>=1.4.1
+
+# ============================================
+# Optional: Depth Camera Support
+# ============================================
+# Uncomment if using RealSense camera for data collection
+# pyrealsense2>=2.54.0
+
+# ============================================
+# Development & Testing (Optional)
+# ============================================
+# pytest>=7.0.0
+# jupyter>=1.0.0
+# ipython>=8.0.0

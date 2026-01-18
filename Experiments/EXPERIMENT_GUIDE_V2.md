@@ -30,9 +30,13 @@
 # Aktifkan virtual environment
 .\venv\Scripts\Activate
 
-# Install required packages
-pip install ultralytics opencv-python numpy pandas matplotlib seaborn
-pip install pyrealsense2  # Jika ingin collect data baru
+# Install semua dependencies dari requirements.txt (recommended untuk reproducibility)
+pip install -r requirements.txt
+
+# ATAU install manual (jika tidak pakai requirements.txt):
+# pip install ultralytics opencv-python numpy pandas matplotlib seaborn
+# pip install anylabeling  # Untuk anotasi
+# pip install pyrealsense2  # Jika ingin collect data baru (opsional)
 ```
 
 ### 0.2. Ekstrak Dataset
