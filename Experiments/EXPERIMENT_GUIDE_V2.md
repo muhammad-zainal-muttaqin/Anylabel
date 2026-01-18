@@ -73,11 +73,11 @@ python simple_eda.py
    ```
 
 2. **Load Dataset**
-   - Menu: `File` → `Change Output Directory` → Pilih: `Experiments/datasets/ffb_localization/labels/`
+   - Menu: `File` → `Change Output Directory` → Pilih: `Experiments/labeling/ffb_localization/json/`
    - Menu: `File` → `Open Dir` → Pilih: `Dataset/gohjinyu-oilpalm-ffb-dataset-d66eb99/ffb-localization/rgb_images/`
 
 3. **Atur Kelas**
-   - Menu: `File` → `Change Save Format` → Pilih: `YOLO`
+   - Menu: `File` → `Change Save Format` → Pilih: `LabelMe (JSON)`
    - Class Editor: Tambah 1 class
      - Name: `fresh_fruit_bunch`
      - Color: (Pilih warna)
@@ -91,7 +91,14 @@ python simple_eda.py
 5. **Target Anotasi**
    - Minimal: 300-500 gambar teranotasi
    - Ideal: 1000+ gambar
-   - Status: Pastikan jumlah file `.txt` = jumlah gambar
+   - Status: Pastikan jumlah file `.json` = jumlah gambar
+
+6. **Konversi JSON → YOLO (.txt)**
+   ```bash
+   cd Experiments\scripts
+   python convert_json_to_yolo.py
+   ```
+   Output YOLO akan ada di: `Experiments/labeling/ffb_localization/yolo_all/`
 
 ### 1.2. Anotasi Klasifikasi (Jika Diperlukan)
 Jika dataset klasifikasi (`ffb-ripeness-classification`) belum ada:

@@ -8,6 +8,8 @@ Dataset/
 Experiments/datasets/
 Experiments/runs/
 Experiments/failure_analysis/
+Experiments/labeling/
+Experiments/eda_output/*.csv
 
 # Virtual Environment
 venv/

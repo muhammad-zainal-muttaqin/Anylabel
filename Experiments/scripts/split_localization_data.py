@@ -8,7 +8,9 @@ import glob
 SOURCE_DATASET_DIR = r"D:\Work\Assisten Dosen\Anylabel\Dataset\gohjinyu-oilpalm-ffb-dataset-d66eb99\ffb-localization"
 SOURCE_IMAGES_DIR = os.path.join(SOURCE_DATASET_DIR, "rgb_images")
 OUTPUT_BASE_DIR = r"D:\Work\Assisten Dosen\Anylabel\Experiments\datasets\ffb_localization"
-LABELS_ALL_DIR = os.path.join(OUTPUT_BASE_DIR, "labels_all")
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LABELING_DIR = os.path.join(PROJECT_DIR, "labeling", "ffb_localization")
+LABELS_ALL_DIR = os.path.join(LABELING_DIR, "yolo_all")
 SOURCE_LABELS_DIRS = [LABELS_ALL_DIR, os.path.join(SOURCE_DATASET_DIR, "labels_yolo")]
 
 # Rasio pembagian

@@ -30,6 +30,8 @@ PROCESSED_DATASETS_DIR = os.path.join(EXPERIMENTS_DIR, "datasets")
 PROCESSED_LOCALIZATION_DIR = os.path.join(PROCESSED_DATASETS_DIR, "ffb_localization")
 PROCESSED_IMAGES_DIR = os.path.join(PROCESSED_LOCALIZATION_DIR, "images")
 PROCESSED_LABELS_DIR = os.path.join(PROCESSED_LOCALIZATION_DIR, "labels")
+LABELING_DIR = os.path.join(EXPERIMENTS_DIR, "labeling", "ffb_localization")
+LABELS_ALL_DIR = os.path.join(LABELING_DIR, "yolo_all")
 
 RIPENESS_DIR = os.path.join(RAW_DATASET_DIR, "ffb-ripeness-classification")
 
@@ -301,6 +303,8 @@ def find_label_roots():
         candidates.append(("raw_labels_yolo", RAW_LABELS_DIR))
     if os.path.exists(PROCESSED_LABELS_DIR):
         candidates.append(("processed_labels", PROCESSED_LABELS_DIR))
+    if os.path.exists(LABELS_ALL_DIR):
+        candidates.append(("labels_all", LABELS_ALL_DIR))
     flat_exp_labels = os.path.join(PROCESSED_LOCALIZATION_DIR, "labels")
     if os.path.exists(flat_exp_labels) and ("processed_labels", flat_exp_labels) not in candidates:
         candidates.append(("processed_labels", flat_exp_labels))
