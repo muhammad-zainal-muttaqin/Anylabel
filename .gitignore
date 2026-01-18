@@ -10,6 +10,8 @@ Experiments/runs/
 Experiments/failure_analysis/
 Experiments/labeling/
 Experiments/eda_output/*.csv
+Experiments/UploadKaggle/
+Experiments/kaggleoutput/
 
 # Virtual Environment
 venv/

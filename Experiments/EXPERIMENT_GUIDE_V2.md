@@ -58,6 +58,43 @@ cd Experiments\scripts
 python simple_eda.py
 ```
 
+### 0.4. Training di Kaggle (Jika PC tidak cukup kuat)
+**Tujuan:** tetap mengikuti tahapan dosen, tapi training dijalankan di GPU Kaggle.
+
+**Yang diupload ke Kaggle Dataset (private):**
+- Folder split siap train: `images/{train,val,test}` dan `labels/{train,val,test}`
+- (Opsional) file YAML dataset (`ffb_localization.yaml`) — tapi bisa juga dibuat langsung di notebook dengan `%%writefile`
+
+**Contoh struktur Kaggle Dataset (disarankan):**
+```
+ffb_localization/
+├── images/
+│   ├── train/
+│   ├── val/
+│   └── test/
+├── labels/
+│   ├── train/
+│   ├── val/
+│   └── test/
+```
+
+**Di Kaggle Notebook (GPU):**
+```python
+!pip install -q ultralytics
+
+%%writefile ffb_localization.yaml
+path: /kaggle/input/<nama-dataset>/ffb_localization
+train: images/train
+val: images/val
+test: images/test
+nc: 1
+names: ['fresh_fruit_bunch']
+
+from ultralytics import YOLO
+model = YOLO("yolo11n.pt")
+model.train(data="ffb_localization.yaml", epochs=50, imgsz=640, batch=16, device=0, seed=42)
+```
+
 ---
 
 ## FASE 1: Anotasi Data (CRITICAL!)
@@ -160,7 +197,8 @@ python prepare_depth_data.py
 **File:** `Experiments/ffb_localization.yaml`
 
 ```yaml
-path: D:/Work/Assisten Dosen/Anylabel/Experiments/datasets/ffb_localization
+# Disarankan (portable): path relatif terhadap file YAML ini
+path: datasets/ffb_localization
 train: images/train
 val: images/val
 test: images/test
@@ -233,7 +271,7 @@ Pastikan `prepare_depth_data.py` sudah dijalankan → `Experiments/datasets/dept
 #### Step 2: Buat Dataset Config Depth
 **File:** `Experiments/ffb_localization_depth.yaml`
 ```yaml
-path: D:/Work/Assisten Dosen/Anylabel/Experiments/datasets/ffb_localization
+path: datasets/ffb_localization
 train: images/train  # Gunakan folder yang sama, tapi gambar dari depth_processed_rgb
 val: images/val
 test: images/test
@@ -305,7 +343,7 @@ yolo detect train config=config_a2_depth.yaml
 #### Step 3: Dataset Config
 **File:** `Experiments/ffb_ripeness.yaml`
 ```yaml
-path: D:/Work/Assisten Dosen/Anylabel/Experiments/datasets/ffb_ripeness
+path: datasets/ffb_ripeness
 train: images/train
 val: images/val
 test: images/test
@@ -387,8 +425,8 @@ Fokus analisis:
 ## Ringkasan Eksekusi
 | Eksperimen | Run #1 (mAP50) | Run #2 (mAP50) | Rata-rata mAP50 | Run #1 (mAP50-95) | Run #2 (mAP50-95) | Rata-rata mAP50-95 |
 |------------|----------------|----------------|-----------------|-------------------|-------------------|-------------------|
-| A.1 RGB    |                |                |                 |                   |                   |                   |
-| A.2 Depth  |                |                |                 |                   |                   |                   |
+| A.1 RGB    | 0.873 (seed 42) | 0.873 (seed 123) | 0.87300 | 0.370 (seed 42) | 0.369 (seed 123) | 0.36933 |
+| A.2 Depth  | 0.640 (seed 42) | 0.615 (seed 123) | 0.62749 | 0.216 (seed 42) | 0.235 (seed 123) | 0.22526 |
 | B.1 Cls    |                |                |                 |                   |                   |                   |
 
 ## Analisis Kegagalan
