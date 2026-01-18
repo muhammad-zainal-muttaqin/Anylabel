@@ -82,7 +82,7 @@ python simple_eda.py
    - Tekan `W` → Gambar bounding box di sekitar TBS
    - Tekan `D` → Next image
    - Tekan `A` → Previous image
-   - **Tips:** Gunakan `Auto Labeling` (YOLO/SAM) untuk estimasi awal, lalu koreksi manual
+   - **Tips:** Gunakan `Auto Labeling` (YOLO/SAM) untuk estimasi awal, lalu **periksa dan koreksi manual** (hasil autolabel harus diperiksa manual)
 
 5. **Target Anotasi**
    - Minimal: 300-500 gambar teranotasi
@@ -104,11 +104,15 @@ cd Experiments\scripts
 python simple_eda.py
 ```
 
-**Cek:**
+**Cek untuk dataset lokalisasi:**
 - Jumlah gambar teranotasi
 - Distribusi ukuran bounding box
 - Jumlah objek per gambar
-- Distribusi kelas (untuk klasifikasi)
+
+**Cek untuk dataset klasifikasi:**
+- Jumlah gambar per kelas (ripe/unripe)
+- Distribusi kelas (apakah seimbang atau tidak)
+- Kualitas gambar (resolusi, blur, dll)
 
 ### 2.2. Split Dataset
 ```bash
@@ -137,8 +141,8 @@ python prepare_depth_data.py
 
 **Process:**
 - Baca depth map asli (16-bit)
-- Normalisasi 0-255
-- Replikasi 3 channel
+- Normalisasi min-max ke rentang 0-255 dengan range depth **0.6m - 6.0m**
+- Replikasi channel depth tunggal sebanyak 3 kali dengan pola: **R=G, G=B, B=R**
 - Output: `Experiments/datasets/depth_processed_rgb/`
 
 ### 2.4. Buat Dataset Config YOLO
@@ -370,11 +374,11 @@ Fokus analisis:
 # Laporan Eksperimen Deteksi TBS Kelapa Sawit
 
 ## Ringkasan Eksekusi
-| Eksperimen | Run #1 (mAP50) | Run #2 (mAP50) | Rata-rata | Std Dev |
-|------------|----------------|----------------|-----------|---------|
-| A.1 RGB    |                |                |           |         |
-| A.2 Depth  |                |                |           |         |
-| B.1 Cls    |                |                |           |         |
+| Eksperimen | Run #1 (mAP50) | Run #2 (mAP50) | Rata-rata mAP50 | Run #1 (mAP50-95) | Run #2 (mAP50-95) | Rata-rata mAP50-95 |
+|------------|----------------|----------------|-----------------|-------------------|-------------------|-------------------|
+| A.1 RGB    |                |                |                 |                   |                   |                   |
+| A.2 Depth  |                |                |                 |                   |                   |                   |
+| B.1 Cls    |                |                |                 |                   |                   |                   |
 
 ## Analisis Kegagalan
 [Contoh gambar failure + analisis]
