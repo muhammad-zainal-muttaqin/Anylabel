@@ -459,6 +459,90 @@ artifacts/kaggleoutput/
 
 ---
 
+## 🔴 Failure Cases Analysis
+
+Berdasarkan analisis confusion matrix dan visual inspection pada validation batch, berikut adalah pola kegagalan yang teridentifikasi:
+
+### A.1 — RGB Localization (Single Class)
+
+**Confusion Matrix Summary (Seed 42):**
+| | Predicted: FFB | Predicted: Background |
+|:--|:--------------:|:---------------------:|
+| **True: FFB** | 165 (TP) | 21 (FN) |
+| **True: Background** | 53 (FP) | — |
+
+**Pola Kegagalan:**
+
+1. **Missed Detection (21 FN = 11.3%)**
+   - FFB yang terhalang daun/pelepah (occlusion)
+   - FFB berukuran sangat kecil di latar belakang
+   - FFB dengan warna mirip daun (unripe muda)
+
+2. **False Positive (53 FP)**
+   - Bagian batang/tangkai yang mirip tekstur FFB
+   - Daun kering dengan bentuk bulat
+   - Artefak visual di area gelap
+
+| Contoh Kasus | Visual |
+|:-------------|:------:|
+| GT (Batch 0) | ![GT](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/val_batch0_labels.jpg) |
+| Pred (Batch 0) | ![Pred](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/val_batch0_pred.jpg) |
+
+**Observasi Visual:**
+- Confidence score bervariasi 0.3–0.9
+- Beberapa prediksi dengan confidence rendah (0.3–0.4) adalah kandidat FP
+- Missed detection umumnya pada objek di pinggir frame atau dengan occlusion tinggi
+
+---
+
+### B.1 — Ripeness Detection (2 Class)
+
+**Confusion Matrix Normalized (Seed 42):**
+| | Pred: Ripe | Pred: Unripe | Pred: Background |
+|:--|:----------:|:------------:|:----------------:|
+| **True: Ripe** | **0.84** | 0.08 | 0.08 |
+| **True: Unripe** | 0.03 | **0.85** | 0.13 |
+
+**Pola Kegagalan:**
+
+1. **Ripe → Unripe Misclassification (8%)**
+   - FFB matang yang terlalu gelap (bayangan)
+   - Ripe dengan sedikit area oranye visible
+   
+2. **Unripe → Ripe Misclassification (3%)**  
+   - FFB muda dengan refleksi cahaya kekuningan
+   - Unripe yang sebagian terekspos matahari langsung
+
+3. **Missed Detection (Ripe 8%, Unripe 13%)**
+   - Occlusion oleh daun
+   - Objek di pinggir frame (cropped)
+
+| Contoh Kasus | Visual |
+|:-------------|:------:|
+| GT (Batch 0) | ![GT B1](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/val_batch0_labels.jpg) |
+| Pred (Batch 0) | ![Pred B1](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/val_batch0_pred.jpg) |
+
+**💡 Insight:**
+- Akurasi klasifikasi Ripe (84%) dan Unripe (85%) cukup seimbang meskipun ada class imbalance (4:1)
+- **Background FP tinggi di Unripe (82%)** — model cenderung over-detect unripe pada area non-FFB
+
+---
+
+### A.2 — Depth Only (Perbandingan)
+
+| GT (Depth) | Pred (Depth) |
+|:----------:|:------------:|
+| ![GT Depth](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/val_batch0_labels.jpg) | ![Pred Depth](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/val_batch0_pred.jpg) |
+
+**Observasi:**
+- Confidence score keseluruhan lebih rendah (0.3–0.7) dibanding RGB
+- Banyak missed detection pada FFB yang mirip kedalaman dengan background
+- Depth map gagal membedakan FFB dari batang pohon pada jarak sama
+
+---
+
+
+
 ## 🎯 Kesimpulan & Rekomendasi
 
 ### Temuan Utama
