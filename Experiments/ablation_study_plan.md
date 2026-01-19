@@ -3,26 +3,25 @@
 ## Tujuan
 Mengisolasi variabel-variabel eksperimen (Model Size, Optimizer, Training Duration) untuk memahami faktor dominan yang meningkatkan performa deteksi FFB.
 
-## 🏆 Ablation Leaderboard (Live)
+## 🏆 Ablation Leaderboard (Test Set - Final)
 
-| ID | Eksperimen | Model | Optimizer | Epochs | **mAP50** (Localize) | **mAP50-95** (Final) | Delta |
+| ID | Eksperimen | Model | Optimizer | Epochs | **mAP50** | **mAP50-95** | Delta |
 |:--:|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Exp 5** | **🚀 Gap 5 (NEW!)** | **Small** | **AdamW** | **300** | 0.880 | **0.468** 🥈 | **+0.098** |
-| **Exp 4** | **Gap 4** | **Small** | **SGD** | 300* | **0.909** | **0.477** 🥇 | **+0.107** |
-| **Exp 1** | Gap 1 (Scaling) | Small | SGD | 50 | 0.918 | 0.469 🥉 | +0.099 |
-| **Exp 2** | Gap 2 (Optimizer) | Nano | AdamW | 50 | 0.908 | 0.438 | +0.068 |
-| **Exp 3** | Gap 3 (Duration) | Nano | SGD | 300* | 0.889 | 0.417 | +0.047 |
-| **Old** | Combo (Prev Best) | Small | AdamW | 38† | 0.876 | 0.414 | +0.044 |
-| **A.1** | Baseline | Nano | SGD | 50 | 0.887 | 0.370 | - |
+| **Exp 4** | **🏆 Gap 4 (Champion)** | **Small** | **SGD** | 300* | **0.875** | **0.433** 🥇 | **+0.063** |
+| **Exp 1** | Gap 1 (Scaling) | Small | SGD | 50 | 0.899 | 0.418 🥈 | +0.048 |
+| **Exp 2** | Gap 2 (Optimizer) | Nano | AdamW | 50 | 0.860 | 0.391 🥉 | +0.021 |
+| **Exp 5** | Gap 5 (AdamW Long) | Small | AdamW | 300 | 0.833 | 0.374 | +0.004 |
+| **A.1** | **Baseline** | Nano | SGD | 50 | 0.873 | 0.370 | - |
+| **Exp 3** | Gap 3 (Duration) | Nano | SGD | 300* | 0.849 | 0.363 | -0.007 |
 
-*\* EarlyStopping aktif (patience=100). † Old Best berhenti di epoch 38 karena patience=20.*
+*\* EarlyStopping aktif (patience=100).*
 
-**Key Takeaways (Final):**
-1.  **🏆 The Champion:** **Small + SGD (300 Epochs)** tetap memberikan skor tertinggi (**0.477**).
-2.  **🚀 AdamW Revival:** Dengan **patience=100** (bukan 20), Small+AdamW mampu mencapai **0.468** — hampir menyaingi SGD! Old Best dulu terlalu cepat dihentikan.
-3.  **⏳ Still Improving:** Gap 5 berjalan full 300 epoch (tidak early stop) dan loss masih menurun → potensi improve dengan **>300 epochs**.
-4.  **Localization Master:** Model Small+SGD mencapai mAP50 **>0.91** hanya dalam 50 epoch.
-5.  **Efficiency King:** **Small + SGD (50 Epochs)** adalah sweet spot untuk prototyping.
+**Key Takeaways (Test Set Evaluation):**
+1.  **🏆 Champion:** **Small + SGD (300 Epochs)** memberikan skor tertinggi (**0.433** mAP50-95).
+2.  **⚠️ Overfitting Alert:** Gap 5 (AdamW 300e) menunjukkan **generalization gap 9pp** (val: 0.466 → test: 0.374) — indikasi overfitting!
+3.  **SGD > AdamW:** Untuk dataset kecil, SGD lebih robust — Gap 4 hanya drop ~4pp saat val→test, vs Gap 5 drop ~9pp.
+4.  **Efficiency King:** **Small + SGD (50 Epochs)** adalah sweet spot untuk prototyping (0.418 dengan 1/6 training cost).
+5.  **Duration Trade-off:** Training lebih lama tidak selalu lebih baik — Gap 3 (300e) lebih buruk dari Baseline (50e).
 
 ## Rencana Eksperimen (Filling the Gaps)
 
@@ -66,9 +65,9 @@ Tujuan: Memaksimalkan konfigurasi terbaik (Small + SGD) dengan durasi penuh.
     *   Name: `exp_gap4_small_sgd_300e`
 *   **Insight:** Peningkatan performa terjadi (+0.8%), namun cost waktu training naik 6x lipat.
 
-### 5. 🚀 AdamW Redemption (Gap 5)
+### 5. ⚠️ AdamW Long Training (Gap 5) — OVERFITTING DETECTED
 Tujuan: Menguji ulang Small+AdamW dengan patience yang proper (100 vs 20).
-*   **Status:** ✅ **Completed** (Result: **0.468** — mAP50-95 tertinggi kedua!)
+*   **Status:** ✅ **Completed** — ⚠️ **OVERFITTING DETECTED!**
 *   **Config:**
     *   Model: `yolo11s.pt` (Small)
     *   Optimizer: `AdamW` (lr0=0.001)
@@ -76,23 +75,26 @@ Tujuan: Menguji ulang Small+AdamW dengan patience yang proper (100 vs 20).
     *   Patience: 100
     *   Seeds: 42, 123
     *   Name: `exp_gap5_small_adamw_300e`
-*   **Results per Seed:**
-    | Seed | mAP50 | mAP50-95 | Status |
-    |:----:|:-----:|:--------:|:------:|
-    | 42 | 0.902 | 0.464 | Full 300e |
-    | 123 | 0.880 | **0.468** | Full 300e |
-*   **🔍 Deep Analysis — Kenapa AdamW Tiba-tiba Kompetitif?**
-    1.  **Patience Terlalu Kecil:** Old Best (patience=20) berhenti di epoch 38, padahal AdamW butuh waktu lebih lama untuk konvergen.
-    2.  **Slow but Steady:** AdamW dengan weight decay yang proper menghasilkan generalisasi lebih baik ketika diberi waktu cukup.
-    3.  **⏳ Still Improving:** Di epoch 290, loss masih menurun (`box_loss: 0.46→0.44`, `cls_loss: 0.27→0.24`). Model **BELUM KONVERGEN sepenuhnya**!
-    4.  **Potensi >300 Epochs:** Trend loss yang masih menurun mengindikasikan potensi mencapai **mAP50-95 = 0.48+** dengan 500 epochs.
+*   **Validation vs Test Set Comparison:**
+    | Seed | Val mAP50-95 | **Test mAP50-95** | Gap |
+    |:----:|:------------:|:-----------------:|:---:|
+    | 42 | 0.464 | 0.367 | **-9.7pp** |
+    | 123 | 0.468 | 0.380 | **-8.8pp** |
+    | **Avg** | 0.466 | **0.374** | **-9.2pp** |
+*   **⚠️ Temuan Overfitting:**
+    1.  **Generalization Gap Besar:** mAP50-95 turun ~9pp dari validation ke test set.
+    2.  **Training Terlalu Lama:** Loss menurun tapi test performance tidak membaik.
+    3.  **SGD Lebih Robust:** Gap 4 (SGD) hanya drop ~4pp, sedangkan Gap 5 (AdamW) drop ~9pp.
+    4.  **Regularisasi Kurang:** AdamW dengan weight decay 0.0005 tidak cukup untuk dataset kecil.
 
 ## Kesimpulan Akhir & Rekomendasi
 1.  **Deployment Configuration:** Gunakan **YOLOv11 Small + SGD**.
 2.  **Training Strategy:**
-    *   Untuk hasil cepat (prototyping): Train **50 Epochs** (mAP **0.469**).
-    *   Untuk hasil maksimal (production): Train **150-200 Epochs** (mAP **~0.477**). Tidak perlu sampai 300.
-3.  **Nano Model:** Hanya gunakan jika resource sangat terbatas, dan **WAJIB** gunakan optimizer **AdamW**.
+    *   Untuk hasil cepat (prototyping): Train **50 Epochs** (mAP50-95 **0.418** test set).
+    *   Untuk hasil maksimal (production): Train **150-200 Epochs** (mAP50-95 **~0.433** test set).
+3.  **⚠️ Hindari AdamW Long Training:** Pada dataset kecil, AdamW 300+ epochs cenderung overfit.
+4.  **Nano Model:** Hanya gunakan jika resource sangat terbatas, dan **WAJIB** gunakan optimizer **AdamW**.
+5.  **Selalu Evaluasi di Test Set:** Validation metrics dapat overoptimistic!
 
 ## Next Steps
 

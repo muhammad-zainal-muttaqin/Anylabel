@@ -52,44 +52,45 @@
 
 Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh **ukuran model** dan **optimizer** terhadap performa deteksi FFB.
 
-**Catatan**: Semua metrik menggunakan **validation set** (80 images) untuk konsistensi perbandingan. Gap 1-3 juga dievaluasi pada test set (40 images) — lihat detail di bawah.
+**Catatan**: Semua metrik menggunakan **test set** (40 images) untuk final evaluation.
 
 | Rank | Eksperimen | Model | Optimizer | Epochs | mAP50 | mAP50-95 | Delta(50-95) |
 |:--:|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| 🥇 | **Gap 4** | **Small** | **SGD** | 300* | **0.903** | **0.477** | **+0.107** |
-| 🥈 | Gap 1 (Scaling) | Small | SGD | 50 | 0.904 | 0.473 | +0.103 |
-| 🥉 | Gap 5 (Latest) | Small | AdamW | 300 | 0.891 | 0.466 | +0.096 |
-| 4 | Gap 2 (Optimizer) | Nano | AdamW | 50 | 0.896 | 0.433 | +0.063 |
-| 5 | Gap 3 (Duration) | Nano | SGD | 300* | 0.881 | 0.420 | +0.050 |
-| 6 | Old Best | Small | AdamW | 38† | 0.876 | 0.414 | +0.044 |
-| 7 | **Baseline (A.1)** | Nano | SGD | 50 | 0.873 | 0.370 | — |
+| 🥇 | **Gap 4** | **Small** | **SGD** | 300* | **0.875** | **0.433** | **+0.063** |
+| 🥈 | Gap 1 (Scaling) | Small | SGD | 50 | 0.899 | 0.418 | +0.048 |
+| 🥉 | Gap 2 (Optimizer) | Nano | AdamW | 50 | 0.860 | 0.391 | +0.021 |
+| 4 | Gap 5 (Latest) | Small | AdamW | 300 | 0.833 | 0.374 | +0.004 |
+| 5 | **Baseline (A.1)** | Nano | SGD | 50 | 0.873 | 0.370 | — |
+| 6 | Gap 3 (Duration) | Nano | SGD | 300* | 0.849 | 0.363 | -0.007 |
 
 *\* EarlyStopping aktif (patience=100). Gap 4 berhenti di epoch 198 (best), Gap 3 berjalan full 300 epochs. † Old Best berhenti di epoch 38 karena patience=20.*
 
-**💡 Ablation Insights:**
-1. **Model Size > Optimizer:** Upgrade dari Nano ke Small memberikan boost terbesar (+10.3pp mAP50-95 untuk Gap 1 vs Baseline).
-2. **SGD > AdamW untuk Small:** Model Small dengan SGD (Gap 4: 0.477) mengungguli AdamW (Gap 5: 0.466) dengan gap +1.1pp di mAP50-95.
-3. **🚀 AdamW Revival:** Dengan **patience=100**, Small+AdamW (Gap 5) mencapai **0.466** — jauh lebih baik dari Old Best (0.414) yang terlalu cepat dihentikan di epoch 38.
-4. **⏳ Still Improving:** Gap 5 berjalan **full 300 epoch** tanpa early stop dan loss masih menurun di akhir training → **potensi improve dengan >300 epochs**.
-5. **Efficiency King:** **Small + SGD + 50 Epochs (Gap 1)** adalah sweet spot untuk prototyping — mencapai 0.473 mAP50-95 dengan cost training ~1/6 dari 300 epochs.
+**💡 Ablation Insights (Test Set):**
+1. **Model Size > Optimizer:** Upgrade dari Nano ke Small memberikan boost (+4.8pp mAP50-95 untuk Gap 1 vs Baseline).
+2. **SGD > AdamW untuk Small:** Model Small dengan SGD (Gap 4: 0.433) mengungguli AdamW (Gap 5: 0.374) dengan gap **+5.9pp** di mAP50-95 pada test set.
+3. **⚠️ Overfitting Gap 5:** AdamW dengan 300 epochs menunjukkan **gap validation-test yang besar** (val: 0.466 → test: 0.374) — indikasi overfitting.
+4. **Efficiency King:** **Small + SGD + 50 Epochs (Gap 1)** adalah sweet spot — mencapai 0.418 mAP50-95 dengan cost training ~1/6 dari 300 epochs.
+5. **Duration Trade-off:** Training lebih lama (300 epochs) tidak selalu lebih baik — Gap 3 Nano 300e (0.363) lebih rendah dari Baseline 50e (0.370).
 
 <details>
-<summary><b>🔍 Gap 5 Deep Analysis — Kenapa AdamW Tiba-tiba Kompetitif?</b></summary>
+<summary><b>🔍 Gap 5 Deep Analysis — Overfitting pada AdamW 300 Epochs</b></summary>
 
-**Results per Seed (Validation Set):**
-| Seed | mAP50 | mAP50-95 | Status |
-|:----:|:-----:|:--------:|:------:|
-| 42 | 0.902 | 0.464 | Full 300e |
-| 123 | 0.880 | **0.468** | Full 300e |
-| **Avg** | **0.891** | **0.466** | — |
+**Validation vs Test Set Comparison:**
+| Seed | Val mAP50 | Val mAP50-95 | **Test mAP50** | **Test mAP50-95** | Gap |
+|:----:|:---------:|:------------:|:--------------:|:-----------------:|:---:|
+| 42 | 0.902 | 0.464 | 0.824 | 0.367 | **-9.7pp** |
+| 123 | 0.880 | 0.468 | 0.841 | 0.380 | **-8.8pp** |
+| **Avg** | 0.891 | 0.466 | **0.833** | **0.374** | **-9.2pp** |
 
-**Analisis:**
-1. **Patience Terlalu Kecil:** Old Best (patience=20) berhenti di epoch 38, padahal AdamW butuh waktu lebih lama untuk konvergen.
-2. **Slow but Steady:** AdamW dengan weight decay menghasilkan generalisasi lebih baik ketika diberi waktu cukup — gap 5.2pp lebih baik dari Old Best.
-3. **⏳ Still Improving:** Di epoch 290-300 (seed 123), loss masih menurun (`box_loss: 0.47→0.44`, `cls_loss: 0.28→0.24`, `dfl_loss: 0.84→0.81`). Model **BELUM KONVERGEN sepenuhnya**!
-4. **Potensi >300 Epochs:** Trend loss yang masih menurun mengindikasikan potensi mencapai **mAP50-95 = 0.47+** dengan 500 epochs.
+**⚠️ Temuan Overfitting:**
+1. **Generalization Gap Besar:** mAP50-95 turun **~9pp** dari validation ke test set — model terlalu fit ke validation set.
+2. **Training Terlalu Lama:** Loss masih menurun di epoch 290-300, tapi performa test set tidak membaik — indikasi overfitting.
+3. **AdamW vs SGD:** SGD (Gap 4) hanya drop ~4pp saat validation→test, sedangkan AdamW (Gap 5) drop ~9pp. SGD lebih robust.
+4. **Regularisasi Kurang:** AdamW dengan weight decay 0.0005 mungkin tidak cukup untuk dataset kecil (280 train images).
 
-**🔥 Next: Gap 6 — Small + AdamW + 500 Epochs** (In Progress)
+**💡 Lesson Learned:**
+- Untuk dataset kecil, **50 epochs + SGD** lebih reliable daripada 300 epochs + AdamW
+- Selalu evaluasi di **test set** untuk menghindari overoptimistic results dari validation set
 </details>
 
 **🔑 Key Insights:**
@@ -354,49 +355,49 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 | 123 | 0.797 | 0.517 | 0.796 | 0.731 | [test_ripeness_detect.txt](artifacts/kaggleoutput/test_ripeness_detect.txt) |
 | **Avg** | **0.801** | **0.514** | 0.787 | 0.739 | — |
 
-### Ablation Study — Gap Experiments (Validation Set)
+### Ablation Study — Gap Experiments (Test Set)
 
-**Gap 1 — Small + SGD + 50 Epochs**
-
-| Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
-|:----:|:-----:|:--------:|:---------:|:------:|:------:|
-| 42 | 0.918 | 0.469 | 0.907 | 0.839 | [test_gap1.txt](artifacts/kaggleoutput/test_gap1.txt) |
-| 123 | 0.889 | 0.477 | 0.851 | 0.828 | [test_gap1.txt](artifacts/kaggleoutput/test_gap1.txt) |
-| **Avg** | **0.904** | **0.473** | 0.879 | 0.834 | — |
-
-**Gap 2 — Nano + AdamW + 50 Epochs**
+**Gap 4 — Small + SGD + 300 Epochs 🥇**
 
 | Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
 |:----:|:-----:|:--------:|:---------:|:------:|:------:|
-| 42 | 0.908 | 0.438 | 0.788 | 0.925 | [test_gap2.txt](artifacts/kaggleoutput/test_gap2.txt) |
-| 123 | 0.883 | 0.428 | 0.818 | 0.843 | [test_gap2.txt](artifacts/kaggleoutput/test_gap2.txt) |
-| **Avg** | **0.896** | **0.433** | 0.803 | 0.884 | — |
+| 42 | 0.873 | 0.422 | 0.793 | 0.810 | [test_gap4.txt](artifacts/kaggleoutput/test_gap4.txt) |
+| 123 | 0.877 | 0.443 | 0.819 | 0.817 | [test_gap4.txt](artifacts/kaggleoutput/test_gap4.txt) |
+| **Avg** | **0.875** | **0.433** | 0.806 | 0.814 | — |
+
+**Gap 1 — Small + SGD + 50 Epochs 🥈**
+
+| Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
+|:----:|:-----:|:--------:|:---------:|:------:|:------:|
+| 42 | 0.918 | 0.415 | 0.822 | 0.838 | [test_gap1.txt](artifacts/kaggleoutput/test_gap1.txt) |
+| 123 | 0.880 | 0.420 | 0.823 | 0.781 | [test_gap1.txt](artifacts/kaggleoutput/test_gap1.txt) |
+| **Avg** | **0.899** | **0.418** | 0.823 | 0.810 | — |
+
+**Gap 2 — Nano + AdamW + 50 Epochs 🥉**
+
+| Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
+|:----:|:-----:|:--------:|:---------:|:------:|:------:|
+| 42 | 0.860 | 0.382 | 0.747 | 0.838 | [test_gap2.txt](artifacts/kaggleoutput/test_gap2.txt) |
+| 123 | 0.860 | 0.399 | 0.760 | 0.810 | [test_gap2.txt](artifacts/kaggleoutput/test_gap2.txt) |
+| **Avg** | **0.860** | **0.391** | 0.754 | 0.824 | — |
+
+**Gap 5 — Small + AdamW + 300 Epochs ⚠️ Overfitting**
+
+| Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
+|:----:|:-----:|:--------:|:---------:|:------:|:------:|
+| 42 | 0.824 | 0.367 | 0.838 | 0.724 | [test_gap5.txt](artifacts/kaggleoutput/test_gap5.txt) |
+| 123 | 0.841 | 0.380 | 0.805 | 0.771 | [test_gap5.txt](artifacts/kaggleoutput/test_gap5.txt) |
+| **Avg** | **0.833** | **0.374** | 0.822 | 0.748 | — |
 
 **Gap 3 — Nano + SGD + 300 Epochs**
 
 | Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
 |:----:|:-----:|:--------:|:---------:|:------:|:------:|
-| 42 | 0.872 | 0.417 | 0.807 | 0.807 | [test_gap3.txt](artifacts/kaggleoutput/test_gap3.txt) |
-| 123 | 0.889 | 0.422 | 0.858 | 0.843 | [test_gap3.txt](artifacts/kaggleoutput/test_gap3.txt) |
-| **Avg** | **0.881** | **0.420** | 0.833 | 0.825 | — |
+| 42 | 0.851 | 0.354 | 0.773 | 0.810 | [test_gap3.txt](artifacts/kaggleoutput/test_gap3.txt) |
+| 123 | 0.847 | 0.371 | 0.785 | 0.724 | [test_gap3.txt](artifacts/kaggleoutput/test_gap3.txt) |
+| **Avg** | **0.849** | **0.363** | 0.779 | 0.767 | — |
 
-**Gap 4 — Small + SGD + 300 Epochs**
-
-| Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
-|:----:|:-----:|:--------:|:---------:|:------:|:------:|
-| 42 | 0.909 | 0.477 | 0.859 | 0.852 | [test_gap4.txt](artifacts/kaggleoutput/test_gap4.txt) |
-| 123 | 0.896 | 0.476 | 0.886 | 0.796 | [test_gap4.txt](artifacts/kaggleoutput/test_gap4.txt) |
-| **Avg** | **0.903** | **0.477** | 0.873 | 0.824 | — |
-
-**Gap 5 — Small + AdamW + 300 Epochs**
-
-| Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
-|:----:|:-----:|:--------:|:---------:|:------:|:------:|
-| 42 | 0.902 | 0.464 | 0.845 | 0.853 | [test_gap5.txt](artifacts/kaggleoutput/test_gap5.txt) |
-| 123 | 0.880 | 0.468 | 0.869 | 0.788 | [test_gap5.txt](artifacts/kaggleoutput/test_gap5.txt) |
-| **Avg** | **0.891** | **0.466** | 0.857 | 0.821 | — |
-
-**Catatan**: Gap 1-3 juga dievaluasi pada test set (40 images). Test set results: Gap 1 (mAP50=0.899, mAP50-95=0.418), Gap 2 (mAP50=0.860, mAP50-95=0.391), Gap 3 (mAP50=0.849, mAP50-95=0.363).
+**Catatan**: Semua Gap experiments dievaluasi pada **test set** (40 images). Ranking: Gap 4 (0.433) > Gap 1 (0.418) > Gap 2 (0.391) > Gap 5 (0.374) > Gap 3 (0.363).
 
 ---
 
