@@ -1,6 +1,6 @@
 ## Laporan Ultimate — Outdoor RGB + Depth Dataset (FFB Lokalisasi & Kematangan)
 
-Dokumen ini adalah versi **lebih detail** dari ringkasan `Experiments/kaggleoutput/result.md` dan dirancang untuk menjadi laporan final (lengkap, terstruktur, dan mudah ditelusuri).
+Dokumen ini adalah versi **lebih detail** dari ringkasan di folder eksperimen. Untuk ringkasan lama (pointer), lihat: [`Experiments/kaggleoutput/result.md`](../../Experiments/kaggleoutput/result.md).
 
 ### A) Ringkasan Eksekutif (1 halaman)
 - **Tujuan**: membangun model YOLO untuk lokalisasi TBS/FFB dan deteksi kematangan (ripe/unripe).
@@ -13,10 +13,10 @@ Dokumen ini adalah versi **lebih detail** dari ringkasan `Experiments/kaggleoutp
 - **Metode validasi**: 2 run per eksperimen (seed 42 & 123), metrik **test**: mAP50 & mAP50-95.
 
 ### B) Dataset & Struktur (yang dipakai training)
-- **RGB lokalisasi**: `Experiments/UploadKaggle/ffb_localization/`
-- **Depth lokalisasi (depth-only)**: `Experiments/UploadKaggle/ffb_localization_depth/`
-- **RGB+Depth (4 channel)**: `Experiments/UploadKaggle/ffb_localization_rgbd/`
-- **Ripeness detect (2 kelas)**: `Experiments/UploadKaggle/ffb_ripeness_detect/`
+- **RGB lokalisasi**: [`Experiments/UploadKaggle/ffb_localization/`](../../Experiments/UploadKaggle/ffb_localization/)
+- **Depth lokalisasi (depth-only)**: [`Experiments/UploadKaggle/ffb_localization_depth/`](../../Experiments/UploadKaggle/ffb_localization_depth/)
+- **RGB+Depth (4 channel)**: [`Experiments/UploadKaggle/ffb_localization_rgbd/`](../../Experiments/UploadKaggle/ffb_localization_rgbd/)
+- **Ripeness detect (2 kelas)**: [`Experiments/UploadKaggle/ffb_ripeness_detect/`](../../Experiments/UploadKaggle/ffb_ripeness_detect/)
 
 Struktur YOLO:
 - `images/{train,val,test}/*.png|*.jpg`
@@ -28,8 +28,8 @@ Depth asli dari dataset jurnal tersimpan sebagai PNG 16-bit (RealSense `z16`), n
 
 #### C.2 Preprocessing yang dipakai untuk dataset training depth-only (versi terbaru)
 Script yang bertanggung jawab:
-- `Experiments/scripts/prepare_depth_data.py`
-- `Experiments/scripts/build_uploadkaggle_depth_only.py`
+- [`Experiments/scripts/prepare_depth_data.py`](../../Experiments/scripts/prepare_depth_data.py)
+- [`Experiments/scripts/build_uploadkaggle_depth_only.py`](../../Experiments/scripts/build_uploadkaggle_depth_only.py)
 
 Aturan preprocessing depth yang diterapkan (sesuai permintaan):
 - **uint16 → mm → meter**: `depth_m = depth_u16 / 1000.0`
@@ -53,7 +53,7 @@ depth_3ch = cv2.merge([depth_u8, depth_u8, depth_u8])
 
 #### C.3 Catatan kompatibilitas hasil lama A.2
 Hasil A.2 yang pernah dicatat sebelumnya kemungkinan berasal dari normalisasi **min-max per-gambar** (lebih “mudah” secara visual tetapi tidak mengunci skala meter).
-Setelah perbaikan preprocessing fixed-range \([0.6, 6.0]\) m, hasil A.2 telah diulang (lihat `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test_depth.txt`).
+Setelah perbaikan preprocessing fixed-range \([0.6, 6.0]\) m, hasil A.2 telah diulang (lihat [`artifacts/kaggleoutput/test_depth.txt`](artifacts/kaggleoutput/test_depth.txt)).
 
 ### D) Protokol Training & Evaluasi (Kaggle)
 Umum:
@@ -91,11 +91,11 @@ YOLO("/kaggle/working/runs/detect/exp_a1_rgb_seed42/weights/best.pt").val(
 ## Ringkasan Hasil Kuantitatif (TEST) — Tabel mAP50 & mAP50-95
 
 > **Sumber Log & Artefak:**
-> - `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test.txt`
-> - `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test_depth.txt`
-> - `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test_4input.txt`
-> - `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test_ripeness_detect.txt`
-> - Artefak kurva/CSV: `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/kaggle/working/runs/detect/...`
+> - [`artifacts/kaggleoutput/test.txt`](artifacts/kaggleoutput/test.txt)
+> - [`artifacts/kaggleoutput/test_depth.txt`](artifacts/kaggleoutput/test_depth.txt)
+> - [`artifacts/kaggleoutput/test_4input.txt`](artifacts/kaggleoutput/test_4input.txt)
+> - [`artifacts/kaggleoutput/test_ripeness_detect.txt`](artifacts/kaggleoutput/test_ripeness_detect.txt)
+> - Artefak kurva/CSV: [`artifacts/kaggleoutput/kaggle/working/runs/detect/`](artifacts/kaggleoutput/kaggle/working/runs/detect/)
 
 Tabel di bawah ini merangkum hasil pengujian model YOLO pada berbagai eksperimen.  
 Ada 4 eksperimen utama:
@@ -153,25 +153,25 @@ Tempel minimal:
 - 2 contoh **FP** (deteksi salah)
 
 Saran penempatan:
-- Simpan gambar ke `Reports/FFB_Ultimate_Report/assets/` lalu link-kan di sini.
+- Simpan gambar ke [`assets/`](assets/) lalu link-kan di sini.
 
 Contoh format:
 - `![A.1 TP example](assets/a1_tp_01.png)`
 
 ### G) Lampiran Artefak (log, CSV, zip)
 #### G.1 Log ringkas yang sudah ada (lokal)
-- `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test.txt`
-- `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test_depth.txt`
-- `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test_4input.txt`
-- `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/test_ripeness_detect.txt`
+- [`artifacts/kaggleoutput/test.txt`](artifacts/kaggleoutput/test.txt)
+- [`artifacts/kaggleoutput/test_depth.txt`](artifacts/kaggleoutput/test_depth.txt)
+- [`artifacts/kaggleoutput/test_4input.txt`](artifacts/kaggleoutput/test_4input.txt)
+- [`artifacts/kaggleoutput/test_ripeness_detect.txt`](artifacts/kaggleoutput/test_ripeness_detect.txt)
 
 #### G.2 CSV hasil training (lokal)
-- `Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/kaggle/working/runs/detect/**/results.csv`
+- Folder runs (kurva/CSV): [`artifacts/kaggleoutput/kaggle/working/runs/detect/`](artifacts/kaggleoutput/kaggle/working/runs/detect/)
 
 #### G.3 Zip runs (dari Kaggle)
 Simpan zip per run, misalnya:
 - `exp_a1_rgb_seed42_train.zip`, `exp_a1_rgb_seed42_test.zip`, dst.
-Letakkan di `Reports/FFB_Ultimate_Report/logs/` atau folder terpisah (jangan di-commit jika terlalu besar).
+Letakkan di [`logs/`](logs/) atau folder terpisah.
 
 ### H) Ringkasan Kendala & Perbaikan (singkat)
 - **Preprocessing depth awal tidak sesuai skala meter**: sempat memakai normalisasi **min-max per-gambar** sehingga tidak merefleksikan rentang fisik \(0.6–6.0m\).
