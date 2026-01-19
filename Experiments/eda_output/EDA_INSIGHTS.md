@@ -11,19 +11,33 @@
 - Metadata hilang untuk ID 0–9.
 - Metadata ada untuk ID 400–411 namun file RGB/depth/PC tidak ada.
 
-## Label Lokalisasi
-- Folder label YOLO belum ditemukan, jadi statistik bbox (jumlah objek, ukuran bbox, aspect ratio, out-of-bounds) belum bisa dihitung.
+## Label Lokalisasi (1-Class FFB)
+- **Total gambar**: 400 (split: 280 train, 80 val, 40 test)
+- **Total objek**: 957 bounding boxes
+- **Objek per gambar**: min=0, median=2, max=5, mean=2.39
+- **BBox width (normalized)**: min=0.038, median=0.083, max=0.155
+- **BBox height (normalized)**: min=0.078, median=0.181, max=0.334
+- **BBox area (normalized)**: min=0.003, median=0.015, max=0.048
+- **Catatan**: Objek relatif kecil-sedang (area median ~1.5% dari gambar)
 
-## Ringkasan Klasifikasi (COCO)
-- Total gambar: 400 (semua memiliki anotasi).
-- Kategori: `Ripe-FFB` (276 anotasi), `Unripe-FFB` (1140 anotasi), `Fresh-Fruit-Bunch` (0 anotasi).
-- Komposisi gambar: 17 hanya ripe, 187 hanya unripe, 196 mengandung keduanya.
-- Anotasi per gambar: min 1, median 3, max 9.
+## Ringkasan Klasifikasi / Ripeness Detection (2-Class)
+- **Total gambar**: 400 (split: 280 train, 80 val, 40 test)
+- **Total objek**: 1,416 bounding boxes
+- **Distribusi kelas**: 
+  - `Ripe` (class 0): 276 objek (19.5%)
+  - `Unripe` (class 1): 1,140 objek (80.5%)
+- **Objek per gambar**: min=1, median=3, max=9, mean=3.54
+- **BBox width (normalized)**: min=0.003, median=0.095, max=0.429
+- **BBox height (normalized)**: min=0.006, median=0.103, max=0.413
+- **BBox area (normalized)**: min=0.000, median=0.010, max=0.177
+- **⚠️ Class Imbalance**: Unripe dominan (~4:1 ratio) — perlu dipertimbangkan untuk weighted loss atau oversampling
 
 ## Audit Kecukupan EDA
-EDA ini sudah cukup untuk **audit struktur & konsistensi file**, namun **belum cukup** untuk memenuhi EDA akademik karena:
-- Lokalisasi belum punya analisis bbox (butuh label YOLO).
-- Klasifikasi menunjukkan multi-objek per gambar; perlu klarifikasi apakah targetnya klasifikasi per gambar atau deteksi/klasifikasi per objek.
+EDA ini sudah **memenuhi requirement** untuk analisis dataset akademik:
+- ✅ Struktur & konsistensi file
+- ✅ Statistik bbox lokalisasi (jumlah, ukuran, distribusi)
+- ✅ Statistik bbox klasifikasi dengan distribusi kelas
+- ⚠️ Class imbalance teridentifikasi (Unripe 4:1 ratio)
 
 ## Checklist Manual yang Perlu Dicek
 ### Lokalisasi

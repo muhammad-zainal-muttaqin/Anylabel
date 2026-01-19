@@ -4,7 +4,40 @@
 
 ---
 
-## 📊 Hasil Utama (Quick Summary)
+## � Exploratory Data Analysis (EDA) Summary
+
+> **Detail lengkap**: [`Experiments/eda_output/EDA_INSIGHTS.md`](../../Experiments/eda_output/EDA_INSIGHTS.md)
+
+### Dataset Overview
+
+| Aspek | Lokalisasi (1-class) | Ripeness (2-class) |
+|:------|:--------------------:|:------------------:|
+| **Total gambar** | 400 | 400 |
+| **Split (train/val/test)** | 280 / 80 / 40 | 280 / 80 / 40 |
+| **Total objek (bbox)** | 957 | 1,416 |
+| **Objek/gambar** | min=0, med=2, max=5 | min=1, med=3, max=9 |
+| **Resolusi gambar** | 1280×720 (RGB) | varies |
+
+
+### Bounding Box Statistics (Normalized)
+
+| Dataset | Width | Height | Area |
+|:--------|:-----:|:------:|:----:|
+| Lokalisasi | 0.038–0.155 (med: 0.083) | 0.078–0.334 (med: 0.181) | 0.003–0.048 |
+| Ripeness | 0.003–0.429 (med: 0.095) | 0.006–0.413 (med: 0.103) | 0.000–0.177 |
+
+### Class Distribution (Ripeness)
+
+| Kelas | Jumlah | Persentase |
+|:-----:|:------:|:----------:|
+| 🍊 Ripe | 276 | 19.5% |
+| 🌿 Unripe | 1,140 | 80.5% |
+
+> ⚠️ **Class Imbalance**: Rasio Unripe:Ripe ~4:1 — dapat mempengaruhi performa klasifikasi kematangan
+
+---
+
+## �📊 Hasil Utama (Quick Summary)
 
 | Eksperimen | Input | Kelas | mAP50 ↑ | mAP50-95 ↑ | Waktu/Epoch |
 |:----------:|:-----:|:-----:|:-------:|:----------:|:-----------:|
