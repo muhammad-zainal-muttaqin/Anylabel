@@ -88,7 +88,7 @@ YOLO("/kaggle/working/runs/detect/exp_a1_rgb_seed42/weights/best.pt").val(
 )
 ```
 
-## Ringkasan Hasil Kuantitatif (TEST) — Tabel mAP50 & mAP50-95
+## Hasil per Eksperimen (per run / seed)
 
 > **Sumber Log & Artefak:**
 > - [`artifacts/kaggleoutput/test.txt`](artifacts/kaggleoutput/test.txt)
@@ -97,37 +97,135 @@ YOLO("/kaggle/working/runs/detect/exp_a1_rgb_seed42/weights/best.pt").val(
 > - [`artifacts/kaggleoutput/test_ripeness_detect.txt`](artifacts/kaggleoutput/test_ripeness_detect.txt)
 > - Artefak kurva/CSV: [`artifacts/kaggleoutput/kaggle/working/runs/detect/`](artifacts/kaggleoutput/kaggle/working/runs/detect/)
 
-Tabel di bawah ini merangkum hasil pengujian model YOLO pada berbagai eksperimen.  
-Ada 4 eksperimen utama:
-- **A.1**: Deteksi FFB dengan gambar RGB saja.
-- **A.2**: Deteksi FFB dengan gambar depth saja (diubah menjadi 3 channel).
-- **A.3**: Deteksi FFB gabungan gambar RGB + depth (total 4 channel).
-- **B.1**: Deteksi tingkat kematangan (2 kelas: matang & mentah) menggunakan gambar RGB.
-
-Setiap eksperimen dilakukan dua kali (dengan seed 42 dan 123) untuk memastikan hasilnya konsisten.  
-Nilai yang dilaporkan:
-- **mAP50**: rata-rata presisi untuk IOU ≥ 0.50 (semakin besar semakin baik)
-- **mAP50-95**: rata-rata presisi untuk IOU dari 0.50 sampai 0.95 (lebih ketat)
-
-| Kode | Eksperimen | Seed | mAP50 | mAP50-95 | Log test | Run folder | results.csv | PR curve | Confusion matrix |
-|---|---|---:|---:|---:|---|---|---|---|---|
-| A.1 | RGB saja (1 kelas) | 42 | 0.873 | 0.370 | [`test.txt`](artifacts/kaggleoutput/test.txt) | [`exp_a1_rgb_seed42/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/) | [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/results.csv) | [`BoxPR_curve.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/BoxPR_curve.png) | [`confusion_matrix.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/confusion_matrix.png) |
-| A.1 | RGB saja (1 kelas) | 123 | 0.873 | 0.369 | [`test.txt`](artifacts/kaggleoutput/test.txt) | [`exp_a1_rgb_seed123/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed123/) | [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed123/results.csv) | [`BoxPR_curve.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed123/BoxPR_curve.png) | [`confusion_matrix.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed123/confusion_matrix.png) |
-|  | **Rata-rata A.1** | - | 0.87300 | 0.36950 | [`test.txt`](artifacts/kaggleoutput/test.txt) | - | - | - | - |
-| A.2 | Depth saja (1→3 ch) | 42 | 0.69304 | 0.26463 | [`test_depth.txt`](artifacts/kaggleoutput/test_depth.txt) | [`exp_a2_depth_seed42/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/) | [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/results.csv) | [`BoxPR_curve.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/BoxPR_curve.png) | [`confusion_matrix.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/confusion_matrix.png) |
-| A.2 | Depth saja (1→3 ch) | 123 | 0.70972 | 0.26283 | [`test_depth.txt`](artifacts/kaggleoutput/test_depth.txt) | [`exp_a2_depth_seed123/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed123/) | [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed123/results.csv) | [`BoxPR_curve.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed123/BoxPR_curve.png) | [`confusion_matrix.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed123/confusion_matrix.png) |
-|  | **Rata-rata A.2** | - | 0.70138 | 0.26373 | [`test_depth.txt`](artifacts/kaggleoutput/test_depth.txt) | - | - | - | - |
-| A.3 | RGB+Depth (4 channel) | 42 | 0.875 | 0.378 | [`test_4input.txt`](artifacts/kaggleoutput/test_4input.txt) | [`exp_a3_rgbd_seed42_train/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/) | [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/results.csv) | [`BoxPR_curve.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/BoxPR_curve.png) | [`confusion_matrix.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/confusion_matrix.png) |
-| A.3 | RGB+Depth (4 channel) | 123 | 0.862 | 0.380 | [`test_4input.txt`](artifacts/kaggleoutput/test_4input.txt) | [`exp_a3_rgbd_seed123_train/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed123_train/) | [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed123_train/results.csv) | [`BoxPR_curve.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed123_train/BoxPR_curve.png) | [`confusion_matrix.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed123_train/confusion_matrix.png) |
-|  | **Rata-rata A.3** | - | 0.86850 | 0.37900 | [`test_4input.txt`](artifacts/kaggleoutput/test_4input.txt) | - | - | - | - |
-| B.1 | Deteksi kematangan (2k) | 42 | 0.804 | 0.511 | [`test_ripeness_detect.txt`](artifacts/kaggleoutput/test_ripeness_detect.txt) | [`exp_b1_ripeness_det_seed42/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/) | [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/results.csv) | [`BoxPR_curve.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/BoxPR_curve.png) | [`confusion_matrix.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/confusion_matrix.png) |
-| B.1 | Deteksi kematangan (2k) | 123 | 0.797 | 0.517 | [`test_ripeness_detect.txt`](artifacts/kaggleoutput/test_ripeness_detect.txt) | [`exp_b1_ripeness_det_seed123/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed123/) | [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed123/results.csv) | [`BoxPR_curve.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed123/BoxPR_curve.png) | [`confusion_matrix.png`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed123/confusion_matrix.png) |
-|  | **Rata-rata B.1** | - | 0.80050 | 0.51400 | [`test_ripeness_detect.txt`](artifacts/kaggleoutput/test_ripeness_detect.txt) | - | - | - | - |
-
 Keterangan:
 - "Rata-rata" adalah nilai rata-rata dari dua seed.
 - Nilai pada kolom "Seed" adalah angka acak yang digunakan saat training untuk menguji konsistensi.
 - "k" pada "2k" maksudnya "2 kelas".
+
+### A.1 — Lokalisasi FFB (RGB only, 1 kelas)
+#### Run: seed 42
+- **Metrik (test)**: mAP50 **0.873**, mAP50-95 **0.370** (lihat [`test.txt`](artifacts/kaggleoutput/test.txt))
+- **Run folder**: [`exp_a1_rgb_seed42/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/)
+- **CSV**: [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/results.csv)
+
+PR curve:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/BoxPR_curve.png)
+
+Confusion matrix:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/confusion_matrix.png)
+
+#### Run: seed 123
+- **Metrik (test)**: mAP50 **0.873**, mAP50-95 **0.369** (lihat [`test.txt`](artifacts/kaggleoutput/test.txt))
+- **Run folder**: [`exp_a1_rgb_seed123/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed123/)
+- **CSV**: [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed123/results.csv)
+
+PR curve:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed123/BoxPR_curve.png)
+
+Confusion matrix:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed123/confusion_matrix.png)
+
+### A.2 — Lokalisasi FFB (Depth only, 1→3 channel)
+#### Run: seed 42
+- **Metrik (test)**: mAP50 **0.69304**, mAP50-95 **0.26463** (lihat [`test_depth.txt`](artifacts/kaggleoutput/test_depth.txt))
+- **Run folder**: [`exp_a2_depth_seed42/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/)
+- **CSV**: [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/results.csv)
+
+PR curve:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/BoxPR_curve.png)
+
+Confusion matrix:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/confusion_matrix.png)
+
+#### Run: seed 123
+- **Metrik (test)**: mAP50 **0.70972**, mAP50-95 **0.26283** (lihat [`test_depth.txt`](artifacts/kaggleoutput/test_depth.txt))
+- **Run folder**: [`exp_a2_depth_seed123/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed123/)
+- **CSV**: [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed123/results.csv)
+
+PR curve:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed123/BoxPR_curve.png)
+
+Confusion matrix:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed123/confusion_matrix.png)
+
+### A.3 — Lokalisasi FFB (RGB+Depth, 4 channel), 50 epochs
+#### Run: seed 42
+- **Metrik (test)**: mAP50 **0.875**, mAP50-95 **0.378** (lihat [`test_4input.txt`](artifacts/kaggleoutput/test_4input.txt))
+- **Run folder (train)**: [`exp_a3_rgbd_seed42_train/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/)
+- **CSV**: [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/results.csv)
+
+PR curve:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/BoxPR_curve.png)
+
+Confusion matrix:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/confusion_matrix.png)
+
+#### Run: seed 123
+- **Metrik (test)**: mAP50 **0.862**, mAP50-95 **0.380** (lihat [`test_4input.txt`](artifacts/kaggleoutput/test_4input.txt))
+- **Run folder (train)**: [`exp_a3_rgbd_seed123_train/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed123_train/)
+- **CSV**: [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed123_train/results.csv)
+
+PR curve:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed123_train/BoxPR_curve.png)
+
+Confusion matrix:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed123_train/confusion_matrix.png)
+
+### B.1 — Deteksi kematangan (2 kelas: ripe/unripe)
+#### Run: seed 42
+- **Metrik (test)**: mAP50 **0.804**, mAP50-95 **0.511** (lihat [`test_ripeness_detect.txt`](artifacts/kaggleoutput/test_ripeness_detect.txt))
+- **Run folder (train)**: [`exp_b1_ripeness_det_seed42/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/)
+- **CSV**: [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/results.csv)
+
+PR curve:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/BoxPR_curve.png)
+
+Confusion matrix:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/confusion_matrix.png)
+
+#### Run: seed 123
+- **Metrik (test)**: mAP50 **0.797**, mAP50-95 **0.517** (lihat [`test_ripeness_detect.txt`](artifacts/kaggleoutput/test_ripeness_detect.txt))
+- **Run folder (train)**: [`exp_b1_ripeness_det_seed123/`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed123/)
+- **CSV**: [`results.csv`](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed123/results.csv)
+
+PR curve:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed123/BoxPR_curve.png)
+
+Confusion matrix:
+
+![](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed123/confusion_matrix.png)
+
+## Ringkasan (tabel) — mAP50 & mAP50-95
+
+| Kode | Eksperimen | Seed | mAP50 | mAP50-95 |
+|---|---|---:|---:|---:|
+| A.1 | RGB saja (1 kelas) | 42 | 0.873 | 0.370 |
+| A.1 | RGB saja (1 kelas) | 123 | 0.873 | 0.369 |
+|  | **Rata-rata A.1** | - | 0.87300 | 0.36950 |
+| A.2 | Depth saja (1→3 ch) | 42 | 0.69304 | 0.26463 |
+| A.2 | Depth saja (1→3 ch) | 123 | 0.70972 | 0.26283 |
+|  | **Rata-rata A.2** | - | 0.70138 | 0.26373 |
+| A.3 | RGB+Depth (4 channel) | 42 | 0.875 | 0.378 |
+| A.3 | RGB+Depth (4 channel) | 123 | 0.862 | 0.380 |
+|  | **Rata-rata A.3** | - | 0.86850 | 0.37900 |
+| B.1 | Deteksi kematangan (2k) | 42 | 0.804 | 0.511 |
+| B.1 | Deteksi kematangan (2k) | 123 | 0.797 | 0.517 |
+|  | **Rata-rata B.1** | - | 0.80050 | 0.51400 |
 
 ---
 
