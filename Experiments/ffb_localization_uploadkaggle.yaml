@@ -1,0 +1,11 @@
+# Dataset Configuration for FFB Localization (UploadKaggle copy)
+# Path: Experiments/ffb_localization_uploadkaggle.yaml
+
+path: D:/Work/Assisten Dosen/Anylabel/Experiments/UploadKaggle/ffb_localization
+train: images/train
+val: images/val
+test: images/test
+
+nc: 1
+names: ['fresh_fruit_bunch']
+

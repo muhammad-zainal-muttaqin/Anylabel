@@ -1,14 +1,14 @@
-# Panduan Eksperimen (Ringkas) — sesuai `Dataset/dataset Goh 2025.md`
+# Panduan Eksperimen
 
 Dokumen ini sengaja **singkat**: hanya apa yang wajib dilakukan + format pelaporan.
 
-## 1) Persiapan Data (wajib)
+## 1) Persiapan Data
 - **Lokalisasi (YOLO format)**: anotasi bounding box **manual** (autolabel boleh, **wajib cek manual**).
-- **EDA**: lakukan EDA untuk dataset lokalisasi dan (jika ada) dataset kematangan.
+- **EDA**: lakukan EDA untuk dataset lokalisasi dan dataset kematangan.
 - **Split**: buat `train/val/test`.
 
 ## 2) Model (baseline)
-- Gunakan **YOLOv11n** atau **YOLOv8n**.
+- Gunakan **YOLOv11n**.
 
 ## 3) Eksperimen yang diminta
 
@@ -24,7 +24,7 @@ Dokumen ini sengaja **singkat**: hanya apa yang wajib dilakukan + format pelapor
 ### B) 2 kelas (ripe/unripe)
 - **B.1 RGB only** (2 kelas: `ripe`, `unripe`) menggunakan dataset kematangan yang tersedia.
 
-## 4) Metode Validasi & Pelaporan (wajib)
+## 4) Metode Validasi & Pelaporan
 - Buat **train/val/test split**.
 - Untuk setiap eksperimen, lakukan **2 kali training run** (random seed berbeda, contoh: **42** dan **123**).
 - Evaluasi pada **test set** dan laporkan:
@@ -39,7 +39,7 @@ Dokumen ini sengaja **singkat**: hanya apa yang wajib dilakukan + format pelapor
 - Arsipkan sebagai `.zip` untuk dianalisis lokal.
 
 ## 6) Referensi file hasil di repo ini
-- Ringkasan angka akhir: `Experiments/kaggleoutput/result.md`
+- Ringkasan/laporan utama: `Reports/FFB_Ultimate_Report/result.md`
 - Log test per eksperimen:
   - A.1: `Experiments/kaggleoutput/test.txt`
   - A.2: `Experiments/kaggleoutput/test_depth.txt`
