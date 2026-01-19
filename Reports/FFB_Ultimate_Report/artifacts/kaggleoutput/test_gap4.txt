@@ -2861,3 +2861,22 @@ YOLO11s summary (fused): 101 layers, 9,413,187 parameters, 0 gradients, 21.3 GFL
                    all         80        186      0.886      0.796      0.896      0.476
 Speed: 0.1ms preprocess, 2.9ms inference, 0.0ms loss, 1.7ms postprocess per image
 Results saved to /kaggle/working/runs/detect/exp_gap1_small_sgd_300e123
+
+Ultralytics 8.4.6 🚀 Python-3.12.12 torch-2.8.0+cu126 CUDA:0 (Tesla T4, 15095MiB)
+YOLO11s summary (fused): 101 layers, 9,413,187 parameters, 0 gradients, 21.3 GFLOPs
+val: Fast image access ✅ (ping: 0.0±0.0 ms, read: 43.2±11.3 MB/s, size: 2705.1 KB)
+val: Scanning /kaggle/input/ffb-localization-dataset/ffb_localization/labels/test... 40 images, 0 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 40/40 64.8it/s 0.6s
+WARNING ⚠️ val: Cache directory /kaggle/input/ffb-localization-dataset/ffb_localization/labels is not writable, cache not saved.
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 3/3 1.6it/s 1.9s
+                   all         40        105      0.793       0.81      0.873      0.422
+Speed: 7.3ms preprocess, 18.4ms inference, 0.0ms loss, 1.8ms postprocess per image
+Results saved to /kaggle/working/runs/detect/test_seed42
+Ultralytics 8.4.6 🚀 Python-3.12.12 torch-2.8.0+cu126 CUDA:0 (Tesla T4, 15095MiB)
+YOLO11s summary (fused): 101 layers, 9,413,187 parameters, 0 gradients, 21.3 GFLOPs
+val: Fast image access ✅ (ping: 0.1±0.3 ms, read: 2579.5±367.3 MB/s, size: 2705.1 KB)
+val: Scanning /kaggle/input/ffb-localization-dataset/ffb_localization/labels/test... 40 images, 0 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 40/40 130.5it/s 0.3s
+WARNING ⚠️ val: Cache directory /kaggle/input/ffb-localization-dataset/ffb_localization/labels is not writable, cache not saved.
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 3/3 1.6it/s 1.8s
+                   all         40        105      0.819      0.817      0.877      0.443
+Speed: 5.8ms preprocess, 6.7ms inference, 0.0ms loss, 2.3ms postprocess per image
+Results saved to /kaggle/working/runs/detect/test_seed123
