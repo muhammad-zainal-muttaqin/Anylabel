@@ -27,12 +27,14 @@
 
 ### Training Dynamics
 
+**Catatan**: Angka di bagian ini berasal dari `results.csv` seed 42.
+
 ![Results A.1 Seed 42](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a1_rgb_seed42/results.png)
 
 **Observasi dari CSV Training:**
-- 📈 **Konvergensi cepat**: mAP50 mencapai >0.80 pada epoch 12-13
-- ✅ **Stabil**: Fluktuasi minimal setelah epoch 20, model tidak overfit
-- 📉 **Loss terus turun**: `box_loss` dari 2.85 → 1.28, `cls_loss` dari 4.20 → 0.79
+- 📈 **Konvergensi cepat**: mAP50 >0.80 sejak epoch 9 (seed 42)
+- ✅ **Stabil**: mAP50 relatif stabil setelah epoch 20; tidak terlihat overfit signifikan
+- 📉 **Loss terus turun**: `box_loss` 2.85 -> 1.28, `cls_loss` 4.20 -> 0.79 (seed 42)
 
 | Metric | Epoch 10 | Epoch 25 | Epoch 50 (Final) |
 |--------|----------|----------|------------------|
@@ -78,12 +80,14 @@
 
 ### Training Dynamics
 
+**Catatan**: Angka di bagian ini berasal dari `results.csv` seed 42.
+
 ![Results A.2 Seed 42](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a2_depth_seed42/results.png)
 
 **Observasi dari CSV Training:**
-- 🐢 **Konvergensi lambat**: mAP50 baru >0.50 pada epoch 14-16 (vs epoch 5-6 di RGB)
-- 📊 **Plateau lebih awal**: Model stuck di ~0.66 setelah epoch 30
-- ⚠️ **Recall rendah**: Maksimal ~0.71 vs ~0.87 di RGB
+- 🐢 **Konvergensi lambat**: mAP50 >0.50 baru di epoch 14 (seed 42) vs epoch 5 di RGB (seed 42)
+- 📊 **Plateau lebih awal**: mAP50 berkisar 0.57-0.68 setelah epoch 30 (seed 42)
+- ⚠️ **Recall rendah**: Maks recall 0.710 (seed 42) vs 0.866 di RGB (seed 42)
 
 | Metric | Epoch 10 | Epoch 25 | Epoch 50 (Final) |
 |--------|----------|----------|------------------|
@@ -129,12 +133,14 @@
 
 ### Training Dynamics
 
+**Catatan**: Angka di bagian ini berasal dari `results.csv` seed 42.
+
 ![Results A.3 Seed 42](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_a3_rgbd_seed42_train/results.png)
 
 **Observasi:**
-- ✅ **Kombinasi terbaik**: mAP50-95 tertinggi di semua eksperimen lokalisasi
-- 📈 **Konvergensi mirip RGB**: Depth tidak memperlambat training
-- 🎯 **Presisi lebih baik**: Bounding box lebih akurat (mAP50-95 ↑)
+- 📈 **mAP50 stabil**: >0.80 sejak epoch 12 dan berada di ~0.85-0.89 setelah epoch 20 (seed 42)
+- 📊 **mAP50-95**: puncak 0.414 di epoch 22 lalu stabil di ~0.37-0.41 hingga akhir (seed 42)
+- 📉 **Loss turun konsisten**: `box_loss` 2.79 -> 1.21, `cls_loss` 4.18 -> 0.764 (seed 42)
 
 ### Precision-Recall Curve
 
@@ -168,12 +174,14 @@
 
 ### Training Dynamics
 
+**Catatan**: Angka di bagian ini berasal dari `results.csv` seed 42.
+
 ![Results B.1 Seed 42](artifacts/kaggleoutput/kaggle/working/runs/detect/exp_b1_ripeness_det_seed42/results.png)
 
 **Observasi dari CSV Training:**
-- 📈 **Konvergensi bertahap**: mAP50 >0.80 pada epoch 14-15
-- 🎯 **mAP50-95 tinggi**: Rata-rata 0.514 — bbox sangat akurat untuk klasifikasi
-- ⚖️ **Precision vs Recall trade-off**: Precision ~0.77, Recall ~0.81
+- 📈 **Konvergensi bertahap**: mAP50 >0.80 pada epoch 14 (seed 42)
+- 🎯 **mAP50-95 tinggi**: epoch 50 = 0.572 (seed 42)
+- ⚖️ **Precision vs Recall trade-off**: Precision 0.773, Recall 0.807 (epoch 50, seed 42)
 
 | Metric | Epoch 10 | Epoch 25 | Epoch 50 (Final) |
 |--------|----------|----------|------------------|
@@ -218,18 +226,18 @@
 
 ## 📈 Perbandingan Kurva Training (All Experiments)
 
-### Loss Comparison (Final Epoch)
+### Loss Comparison (Final Epoch, Seed 42)
 
 | Experiment | Box Loss | Cls Loss | DFL Loss |
 |:----------:|:--------:|:--------:|:--------:|
 | A.1 RGB | 1.277 | 0.793 | 1.097 |
 | A.2 Depth | 1.638 | 1.305 | 1.303 |
-| A.3 RGBD | ~1.3 | ~0.85 | ~1.1 |
+| A.3 RGBD | 1.211 | 0.764 | 1.066 |
 | B.1 Ripeness | 0.790 | 0.769 | 0.926 |
 
 **Insight**: 
 - A.2 memiliki loss tertinggi — model struggle dengan depth-only input
-- B.1 memiliki loss terendah — task classification lebih "mudah" dengan 2 kelas
+- B.1 terendah pada box_loss dan dfl_loss; cls_loss terendah ada di A.3
 
 ---
 
