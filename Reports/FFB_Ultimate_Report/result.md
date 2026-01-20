@@ -675,6 +675,15 @@ YOLO default hanya menerima 3-channel input (RGB). Training 4-channel (R,G,B,D) 
 - RGB+Depth: `Experiments/UploadKaggle/ffb_localization_rgbd/`
 - Ripeness: `Experiments/UploadKaggle/ffb_ripeness_detect/`
 
+### Project Structure (Updated 2026-01-20)
+
+Setelah reorganisasi, struktur project sekarang lebih terorganisir:
+- **Training scripts**: `Experiments/scripts/train_*.py`
+- **YAML configs**: `Experiments/configs/*.yaml`
+- **Data collection utilities**: `Dataset/scripts/*.py`
+
+Lihat [CLAUDE.md](../../CLAUDE.md) untuk dokumentasi lengkap struktur project.
+
 ---
 
-*Report generated: 2026-01-19 | Model: YOLOv11n | Framework: Ultralytics*
+*Report generated: 2026-01-19 | Updated: 2026-01-20 | Model: YOLOv11n | Framework: Ultralytics*
