@@ -1,6 +1,9 @@
 # Custom Instructions
 .factory/instructions.md
 
+# Claude Code
+.claude/
+
 # Dataset (large files)
 Dataset/
 
