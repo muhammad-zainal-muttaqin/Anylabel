@@ -11,7 +11,7 @@ def train():
     # - optimizer='AdamW': often improved convergence for custom datasets
     # - lr0=0.001: typical starting LR for AdamW (lower than SGD's 0.01)
     results = model.train(
-        data='D:/Work/Assisten Dosen/Anylabel/Experiments/ffb_localization.yaml',
+        data='D:/Work/Assisten Dosen/Anylabel/Experiments/configs/ffb_localization.yaml',
         epochs=100,
         imgsz=640,
         batch=16,
