@@ -25,6 +25,8 @@ pip install -r requirements.txt
 - opencv-python
 - numpy, pandas, matplotlib, seaborn
 - anylabeling (for manual annotation)
+- **NEW**: torch, transformers (for Depth-Anything-V2)
+- **NEW**: albumentations (for RGBD synced augmentation)
 
 ## Project Structure
 
@@ -51,30 +53,57 @@ Anylabel/
 │   │   ├── Training:
 │   │   │   ├── train_a1_rgb.py
 │   │   │   ├── train_a2_depth.py
+│   │   │   ├── train_a3_rgbd.py              # NEW: RGB+Depth 4-channel
+│   │   │   ├── train_a4a_synthetic_depth.py  # NEW: Synthetic depth only
+│   │   │   ├── train_a4b_rgbd_synthetic.py   # NEW: RGB+Synthetic depth
 │   │   │   ├── train_b1_classification.py
+│   │   │   ├── train_b2_stage1_detector.py   # NEW: Two-stage Stage 1
+│   │   │   ├── train_b2_stage2_classifier.py # NEW: Two-stage Stage 2
 │   │   │   ├── train_ablation.py
 │   │   │   └── train_scaling_adamw.py
+│   │   ├── Data Generation:
+│   │   │   ├── generate_synthetic_depth.py   # NEW: Depth-Anything-V2
+│   │   │   ├── prepare_synthetic_depth_data.py
+│   │   │   ├── extract_crops_b2.py           # NEW: Extract crops for B.2
+│   │   │   └── custom_rgbd_dataset.py        # NEW: RGBD dataloader
 │   │   ├── Evaluation:
 │   │   │   ├── evaluate_all.py
 │   │   │   ├── failure_analysis.py
-│   │   │   └── find_best_map.py
+│   │   │   ├── find_best_map.py
+│   │   │   ├── inference_b2_twostage.py      # NEW: Two-stage inference
+│   │   │   └── compare_real_vs_synthetic.py  # NEW: A.2 vs A.4a comparison
 │   │   └── Kaggle Upload:
 │   │       ├── build_uploadkaggle_depth_only.py
 │   │       ├── build_uploadkaggle_rgbd_pairs.py
-│   │       ├── build_uploadkaggle_ripeness_*.py
+│   │       ├── build_uploadkaggle_synthetic_depth.py  # NEW: For A.4a
+│   │       └── build_uploadkaggle_ripeness_*.py
 │   ├── configs/                     # YOLO dataset configuration files
 │   │   ├── ffb_localization.yaml
+│   │   ├── ffb_localization_rgbd.yaml                # NEW: A.3 config
+│   │   ├── ffb_localization_rgbd_synthetic.yaml      # NEW: A.4b config
+│   │   ├── ffb_localization_depth_synthetic.yaml     # NEW: A.4a config
+│   │   ├── ffb_ripeness_detect.yaml                  # NEW: B.2 Stage 1 config
 │   │   └── ffb_localization_uploadkaggle.yaml
 │   ├── datasets/                    # Processed datasets (train/val/test splits)
 │   │   ├── ffb_localization/       # RGB dataset (YOLO format)
-│   │   ├── ffb_localization_depth/ # Depth dataset
-│   │   ├── depth_processed_rgb/    # 3-channel depth (0-255)
-│   │   └── ffb_ripeness/           # Ripeness classification dataset
+│   │   ├── ffb_localization_depth/ # Real depth dataset
+│   │   ├── ffb_localization_depth_synthetic/     # NEW: Synthetic depth dataset (A.4a)
+│   │   ├── depth_processed_rgb/    # 3-channel real depth (0-255)
+│   │   ├── depth_synthetic_da2/    # NEW: 3-channel synthetic depth
+│   │   ├── ffb_ripeness/           # Ripeness classification dataset
+│   │   └── ffb_ripeness_twostage_crops/          # NEW: Crops for B.2 Stage 2
 │   ├── UploadKaggle/               # Kaggle dataset packages (ZIP files)
 │   ├── kaggleoutput/               # Training results from Kaggle
 │   ├── eda_output/                 # EDA reports & visualizations
 │   ├── labeling/                   # Manual annotation workspace
+│   ├── notebooks/                   # NEW: Jupyter Notebooks for V3 experiments
+│   │   ├── train_a3_rgbd_fix.ipynb
+│   │   ├── generate_synthetic_depth.ipynb
+│   │   ├── train_a4a_synthetic_depth.ipynb
+│   │   ├── train_a4b_rgbd_synthetic.ipynb
+│   │   └── train_b2_twostage.ipynb
 │   ├── EXPERIMENT_GUIDE_V2.md      # Experiment requirements (Indonesian)
+│   ├── EXPERIMENT_GUIDE_V3.md      # NEW: V3 experiments + notebooks guide
 │   ├── README.md                   # Technical setup guide (English)
 │   └── ablation_study_plan.md      # Ablation study results & analysis
 └── Reports/
@@ -84,6 +113,43 @@ Anylabel/
         ├── result.md               # Main consolidated report
         └── README.md
 ```
+
+## Jupyter Notebooks (V3 Experiments)
+
+**NEW**: All V3 experiments now have Jupyter Notebooks for easier execution:
+
+| Notebook | Experiment | Description |
+|:---------|:-----------|:------------|
+| `train_a3_rgbd_fix.ipynb` | A.3 Fix | RGB+Depth dengan augmentasi tersingkron |
+| `generate_synthetic_depth.ipynb` | Data Prep | Generate synthetic depth (Depth-Anything-V2) |
+| `train_a4a_synthetic_depth.ipynb` | A.4a | Synthetic depth only (3-channel) |
+| `train_a4b_rgbd_synthetic.ipynb` | A.4b | RGB + Synthetic depth (4-channel) |
+| `train_b2_twostage.ipynb` | B.2 | Two-stage classification (full pipeline) |
+
+**Key Features**:
+- Auto-detect environment (Kaggle vs Local)
+- Auto-save results to `kaggleoutput/*.txt`
+- Training 2 seeds (42, 123) for reproducibility
+- Comprehensive evaluation with comparison tables
+
+**Usage - Local**:
+```bash
+cd Experiments
+jupyter lab
+# or
+jupyter notebook
+# Navigate to notebooks/ and run
+```
+
+**Usage - Kaggle**:
+1. Copy-paste notebook content to new Kaggle notebook
+2. Add required datasets
+3. Enable GPU accelerator
+4. Run all cells
+
+See `EXPERIMENT_GUIDE_V3.md` → "Jupyter Notebooks - Panduan Penggunaan" for complete guide.
+
+---
 
 ## Common Commands
 
@@ -98,6 +164,11 @@ python simple_eda.py
 python split_localization_data.py
 
 # Step 3: Process depth maps (0.6m-6m → 0-255, 1→3 channel)
+python prepare_depth_data.py
+
+# NEW: Generate synthetic depth using Depth-Anything-V2
+python generate_synthetic_depth.py         # Takes 20-30 min on GPU
+python prepare_synthetic_depth_data.py     # Organize synthetic depth
 python prepare_depth_data.py
 
 # Convert JSON annotations to YOLO format
@@ -120,8 +191,23 @@ python train_a1_rgb.py
 # A.2: Depth Only (3-channel depth)
 python train_a2_depth.py
 
-# B.1: Ripeness Classification
+# NEW A.3: RGB+Depth (4-channel, with augmentation fix)
+python train_a3_rgbd.py
+
+# NEW A.4a: Synthetic Depth Only
+python train_a4a_synthetic_depth.py
+
+# NEW A.4b: RGB+Synthetic Depth (4-channel)
+python train_a4b_rgbd_synthetic.py
+
+# B.1: Ripeness Detection (2-class end-to-end)
 python train_b1_classification.py
+
+# NEW B.2: Two-Stage Ripeness Classification
+python train_b2_stage1_detector.py    # Stage 1: Detect FFBs
+python extract_crops_b2.py             # Extract crops from detections
+python train_b2_stage2_classifier.py   # Stage 2: Classify crops
+python inference_b2_twostage.py        # Run end-to-end pipeline
 
 # Ablation Studies (modify config inside the script)
 python train_ablation.py
@@ -168,9 +254,12 @@ python build_uploadkaggle_ripeness_crops.py
 
 ### Experiment Types
 - **A.1**: RGB-only localization (1 class: fresh_fruit_bunch)
-- **A.2**: Depth-only localization (depth normalized to 3-channel RGB)
-- **A.3**: RGB+Depth fusion (4-channel input, requires model modification)
-- **B.1**: Ripeness detection/classification (2 classes: ripe, unripe)
+- **A.2**: Depth-only localization (real depth, 3-channel)
+- **A.3**: RGB+Depth fusion (4-channel, **FIXED** with proper augmentation)
+- **A.4a**: Synthetic depth-only (Depth-Anything-V2, 3-channel)
+- **A.4b**: RGB+Synthetic depth fusion (4-channel)
+- **B.1**: Ripeness detection (2-class end-to-end: ripe, unripe)
+- **B.2**: Two-stage ripeness (Detect → Crop → Classify)
 
 ### Training Standards
 - **Model**: YOLOv11n (Nano) baseline, YOLOv11s (Small) for ablation
@@ -292,7 +381,37 @@ ls Experiments\datasets\ffb_localization\labels\train
 
 - Dataset: Extracted and split (train/val/test)
 - Annotations: Manual labeling completed (300+ images)
-- Baseline experiments: A.1 (RGB), A.2 (Depth), B.1 (Classification) completed
+- Baseline experiments: A.1 (RGB), A.2 (Depth), B.1 (Detection) completed
+- **NEW Experiments**: A.3 (RGBD fixed), A.4a/A.4b (Synthetic depth), B.2 (Two-stage)
 - Ablation studies: YOLOv11s vs YOLOv11n, SGD vs AdamW, 50e vs 300e completed
 - Best model: YOLOv11s + SGD + 300 epochs (mAP50-95: 0.433 on test set)
 - Reports: Consolidated in `Reports/FFB_Ultimate_Report/`
+
+## New Additions (2026-01-21)
+
+### A.3 RGBD Fix
+- **Issue**: Previous A.3 had inconsistent augmentation (HSV disabled)
+- **Fix**: Created `custom_rgbd_dataset.py` with synced augmentation
+- **Options**: Option A (HSV on RGB), Option B (no HSV for fair comparison)
+- **Files**: `train_a3_rgbd.py`, `custom_rgbd_dataset.py`, `ffb_localization_rgbd.yaml`
+
+### A.4 Synthetic Depth
+- **Model**: Depth-Anything-V2-Large from HuggingFace
+- **Purpose**: Test if synthetic depth can replace real depth sensor
+- **Variants**:
+  - A.4a: Synthetic depth only (compare with A.2)
+  - A.4b: RGB + Synthetic depth (compare with A.3)
+- **Files**: `generate_synthetic_depth.py`, `prepare_synthetic_depth_data.py`, 
+  `train_a4a_synthetic_depth.py`, `train_a4b_rgbd_synthetic.py`
+- **Comparison**: `compare_real_vs_synthetic.py` generates analysis
+
+### B.2 Two-Stage Classification
+- **Approach**: Detect → Crop → Classify (vs B.1 end-to-end)
+- **Hypothesis**: Cropping improves classification accuracy
+- **Pipeline**:
+  1. Stage 1: Train detector for ripe/unripe FFBs
+  2. Extract crops with 10% margin
+  3. Stage 2: Train specialized classifier on crops
+  4. Inference: Run full pipeline end-to-end
+- **Files**: `train_b2_stage1_detector.py`, `extract_crops_b2.py`, 
+  `train_b2_stage2_classifier.py`, `inference_b2_twostage.py`

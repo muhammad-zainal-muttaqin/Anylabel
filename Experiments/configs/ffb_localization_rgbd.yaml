@@ -1,0 +1,19 @@
+# Dataset Configuration for FFB Localization - RGBD (4-channel)
+# Path: Experiments/configs/ffb_localization_rgbd.yaml
+#
+# This config is used for A.3 experiments (RGB+Depth fusion)
+# Uses custom RGBD dataset with synchronized augmentation
+
+path: D:/Work/Assisten Dosen/Anylabel/Experiments/datasets/ffb_localization
+depth_dir: D:/Work/Assisten Dosen/Anylabel/Experiments/datasets/depth_processed_rgb
+
+train: images/train
+val: images/val
+test: images/test
+
+nc: 1
+names: ['fresh_fruit_bunch']
+
+# Note: Custom dataset loader will use depth_dir to load paired depth maps
+# RGB images from path/{train,val,test}
+# Depth images from depth_dir/*.png (matched by filename)
