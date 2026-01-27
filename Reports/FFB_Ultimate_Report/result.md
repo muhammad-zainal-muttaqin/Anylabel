@@ -56,24 +56,24 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 
 | Rank | Eksperimen | Model | Optimizer | Epochs | mAP50 | mAP50-95 | Delta(50-95) |
 |:--:|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| 🥇 | **Gap 4** | **Small** | **SGD** | 300* | **0.875** | **0.433** | **+0.063** |
-| 🥈 | Gap 1 (Scaling) | Small | SGD | 50 | 0.899 | 0.418 | +0.048 |
-| 🥉 | Gap 2 (Optimizer) | Nano | AdamW | 50 | 0.860 | 0.391 | +0.021 |
-| 4 | Gap 5 (Latest) | Small | AdamW | 300 | 0.833 | 0.374 | +0.004 |
+| 🥇 | **Ablation 4** | **Small** | **SGD** | 300* | **0.875** | **0.433** | **+0.063** |
+| 🥈 | Ablation 1 (Scaling) | Small | SGD | 50 | 0.899 | 0.418 | +0.048 |
+| 🥉 | Ablation 2 (Optimizer) | Nano | AdamW | 50 | 0.860 | 0.391 | +0.021 |
+| 4 | Ablation 5 (Latest) | Small | AdamW | 300 | 0.833 | 0.374 | +0.004 |
 | 5 | **Baseline (A.1)** | Nano | SGD | 50 | 0.873 | 0.370 | — |
-| 6 | Gap 3 (Duration) | Nano | SGD | 300* | 0.849 | 0.363 | -0.007 |
+| 6 | Ablation 3 (Duration) | Nano | SGD | 300* | 0.849 | 0.363 | -0.007 |
 
-*\* EarlyStopping aktif (patience=100). Gap 4 berhenti di epoch 198 (best), Gap 3 berjalan full 300 epochs. † Old Best berhenti di epoch 38 karena patience=20.*
+*\* EarlyStopping aktif (patience=100). Ablation 4 berhenti di epoch 198 (best), Ablation 3 berjalan full 300 epochs. † Old Best berhenti di epoch 38 karena patience=20.*
 
 **💡 Ablation Insights (Test Set):**
-1. **Model Size > Optimizer:** Upgrade dari Nano ke Small memberikan boost (+4.8pp mAP50-95 untuk Gap 1 vs Baseline).
-2. **SGD > AdamW untuk Small:** Model Small dengan SGD (Gap 4: 0.433) mengungguli AdamW (Gap 5: 0.374) dengan gap **+5.9pp** di mAP50-95 pada test set.
-3. **⚠️ Overfitting Gap 5:** AdamW dengan 300 epochs menunjukkan **gap validation-test yang besar** (val: 0.466 → test: 0.374) — indikasi overfitting.
-4. **Efficiency King:** **Small + SGD + 50 Epochs (Gap 1)** adalah sweet spot — mencapai 0.418 mAP50-95 dengan cost training ~1/6 dari 300 epochs.
-5. **Duration Trade-off:** Training lebih lama (300 epochs) tidak selalu lebih baik — Gap 3 Nano 300e (0.363) lebih rendah dari Baseline 50e (0.370).
+1. **Model Size > Optimizer:** Upgrade dari Nano ke Small memberikan boost (+4.8pp mAP50-95 untuk Ablation 1 vs Baseline).
+2. **SGD > AdamW untuk Small:** Model Small dengan SGD (Ablation 4: 0.433) mengungguli AdamW (Ablation 5: 0.374) dengan gap **+5.9pp** di mAP50-95 pada test set.
+3. **⚠️ Overfitting Ablation 5:** AdamW dengan 300 epochs menunjukkan **gap validation-test yang besar** (val: 0.466 → test: 0.374) — indikasi overfitting.
+4. **Efficiency King:** **Small + SGD + 50 Epochs (Ablation 1)** adalah sweet spot — mencapai 0.418 mAP50-95 dengan cost training ~1/6 dari 300 epochs.
+5. **Duration Trade-off:** Training lebih lama (300 epochs) tidak selalu lebih baik — Ablation 3 Nano 300e (0.363) lebih rendah dari Baseline 50e (0.370).
 
 <details>
-<summary><b>🔍 Gap 5 Deep Analysis — Overfitting pada AdamW 300 Epochs</b></summary>
+<summary><b>🔍 Ablation 5 Deep Analysis — Overfitting pada AdamW 300 Epochs</b></summary>
 
 **Validation vs Test Set Comparison:**
 | Seed | Val mAP50 | Val mAP50-95 | **Test mAP50** | **Test mAP50-95** | Gap |
@@ -85,7 +85,7 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 **⚠️ Temuan Overfitting:**
 1. **Generalization Gap Besar:** mAP50-95 turun **~9pp** dari validation ke test set — model terlalu fit ke validation set.
 2. **Training Terlalu Lama:** Loss masih menurun di epoch 290-300, tapi performa test set tidak membaik — indikasi overfitting.
-3. **AdamW vs SGD:** SGD (Gap 4) hanya drop ~4pp saat validation→test, sedangkan AdamW (Gap 5) drop ~9pp. SGD lebih robust.
+3. **AdamW vs SGD:** SGD (Ablation 4) hanya drop ~4pp saat validation→test, sedangkan AdamW (Ablation 5) drop ~9pp. SGD lebih robust.
 4. **Regularisasi Kurang:** AdamW dengan weight decay 0.0005 mungkin tidak cukup untuk dataset kecil (280 train images).
 
 **💡 Lesson Learned:**
@@ -355,9 +355,9 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 | 123 | 0.797 | 0.517 | 0.796 | 0.731 | [test_ripeness_detect.txt](artifacts/kaggleoutput/test_ripeness_detect.txt) |
 | **Avg** | **0.801** | **0.514** | 0.787 | 0.739 | — |
 
-### Ablation Study — Gap Experiments (Test Set)
+### Ablation Study — Ablation Experiments (Test Set)
 
-**Gap 4 — Small + SGD + 300 Epochs 🥇**
+**Ablation 4 — Small + SGD + 300 Epochs 🥇**
 
 | Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
 |:----:|:-----:|:--------:|:---------:|:------:|:------:|
@@ -365,7 +365,7 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 | 123 | 0.877 | 0.443 | 0.819 | 0.817 | [test_gap4.txt](artifacts/kaggleoutput/test_gap4.txt) |
 | **Avg** | **0.875** | **0.433** | 0.806 | 0.814 | — |
 
-**Gap 1 — Small + SGD + 50 Epochs 🥈**
+**Ablation 1 — Small + SGD + 50 Epochs 🥈**
 
 | Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
 |:----:|:-----:|:--------:|:---------:|:------:|:------:|
@@ -373,7 +373,7 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 | 123 | 0.880 | 0.420 | 0.823 | 0.781 | [test_gap1.txt](artifacts/kaggleoutput/test_gap1.txt) |
 | **Avg** | **0.899** | **0.418** | 0.823 | 0.810 | — |
 
-**Gap 2 — Nano + AdamW + 50 Epochs 🥉**
+**Ablation 2 — Nano + AdamW + 50 Epochs 🥉**
 
 | Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
 |:----:|:-----:|:--------:|:---------:|:------:|:------:|
@@ -381,7 +381,7 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 | 123 | 0.860 | 0.399 | 0.760 | 0.810 | [test_gap2.txt](artifacts/kaggleoutput/test_gap2.txt) |
 | **Avg** | **0.860** | **0.391** | 0.754 | 0.824 | — |
 
-**Gap 5 — Small + AdamW + 300 Epochs ⚠️ Overfitting**
+**Ablation 5 — Small + AdamW + 300 Epochs ⚠️ Overfitting**
 
 | Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
 |:----:|:-----:|:--------:|:---------:|:------:|:------:|
@@ -389,7 +389,7 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 | 123 | 0.841 | 0.380 | 0.805 | 0.771 | [test_gap5.txt](artifacts/kaggleoutput/test_gap5.txt) |
 | **Avg** | **0.833** | **0.374** | 0.822 | 0.748 | — |
 
-**Gap 3 — Nano + SGD + 300 Epochs**
+**Ablation 3 — Nano + SGD + 300 Epochs**
 
 | Seed | mAP50 | mAP50-95 | Precision | Recall | Source |
 |:----:|:-----:|:--------:|:---------:|:------:|:------:|
@@ -397,7 +397,7 @@ Studi ablasi dilakukan pada eksperimen A.1 (RGB Only) untuk mengisolasi pengaruh
 | 123 | 0.847 | 0.371 | 0.785 | 0.724 | [test_gap3.txt](artifacts/kaggleoutput/test_gap3.txt) |
 | **Avg** | **0.849** | **0.363** | 0.779 | 0.767 | — |
 
-**Catatan**: Semua Gap experiments dievaluasi pada **test set** (40 images). Ranking: Gap 4 (0.433) > Gap 1 (0.418) > Gap 2 (0.391) > Gap 5 (0.374) > Gap 3 (0.363).
+**Catatan**: Semua Ablation experiments dievaluasi pada **test set** (40 images). Ranking: Ablation 4 (0.433) > Ablation 1 (0.418) > Ablation 2 (0.391) > Ablation 5 (0.374) > Ablation 3 (0.363).
 
 ---
 
