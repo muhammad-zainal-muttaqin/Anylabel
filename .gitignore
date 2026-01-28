@@ -67,6 +67,16 @@ auto_labeling/
 Thumbs.db
 desktop.ini
 
+# Windows reserved filenames that can cause git issues
+nul
+NUL
+con
+CON
+prn
+PRN
+aux
+AUX
+
 # Logs
 *.log
 logs/
