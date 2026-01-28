@@ -16,6 +16,9 @@ Experiments/eda_output/*.csv
 Experiments/UploadKaggle/
 Experiments/kaggleoutput/
 
+# Reports artifacts (ZIP files)
+Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/5_seed/**/*.zip
+
 # Virtual Environment
 venv/
 anylabeling-env/
@@ -73,3 +76,23 @@ logs/
 *.temp
 .temp/
 tmp/
+
+# Large files not needed for results display
+*.zip
+*.pt
+*.yaml
+
+# Dataset files (if any)
+datasets/
+images/
+labels/
+
+# 5_seed experiment datasets (large folders)
+Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/5_seed/**/datasets/
+Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/5_seed/**/images/
+Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/5_seed/**/labels/
+Reports/FFB_Ultimate_Report/artifacts/kaggleoutput/5_seed/**/crops/
+
+# Python cache
+__pycache__/
+*.pyc
