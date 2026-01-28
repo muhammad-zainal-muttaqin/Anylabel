@@ -490,6 +490,68 @@ def reset_bn_stats_simple(model: nn.Module) -> nn.Module:
     return model
 
 
+def reset_bn_stats_with_dummy(
+    model: nn.Module,
+    num_batches: int = 10,
+    batch_size: int = 16,
+    img_size: int = 640,
+    device: str = "cuda",
+) -> nn.Module:
+    """
+    Reset BatchNorm running statistics using dummy input (no dataloader needed).
+
+    This is the most compatible method and works with all Ultralytics versions.
+    It uses random noise as input to estimate new BN statistics.
+
+    Args:
+        model: PyTorch model containing BatchNorm layers.
+        num_batches: Number of dummy batches to forward (default: 10).
+        batch_size: Batch size for dummy input.
+        img_size: Image size for dummy input.
+        device: Device to run on ('cuda' or 'cpu').
+
+    Returns:
+        nn.Module: Model with updated BN statistics.
+
+    Example:
+        >>> from ultralytics import YOLO
+        >>> model = YOLO("yolo11n.pt")
+        >>> model.model = reset_bn_stats_with_dummy(model.model, num_batches=10)
+        >>> # Model now has BN stats adapted to new domain
+    """
+    # Reset running stats
+    bn_count = 0
+    for module in model.modules():
+        if isinstance(module, (nn.BatchNorm2d, nn.BatchNorm1d)):
+            module.reset_running_stats()
+            module.momentum = 0.1  # Higher momentum for faster adaptation
+            bn_count += 1
+
+    logger.info(f"Reset {bn_count} BatchNorm layers, adapting with {num_batches} dummy batches...")
+
+    # Store original training state
+    was_training = model.training
+    model.train()
+
+    # Forward pass with dummy input
+    device_obj = torch.device(device if torch.cuda.is_available() and device == 'cuda' else 'cpu')
+    model = model.to(device_obj)
+    dummy_input = torch.randn(batch_size, 3, img_size, img_size).to(device_obj)
+
+    with torch.no_grad():
+        for i in range(num_batches):
+            _ = model(dummy_input)
+            if (i + 1) % 5 == 0:
+                logger.info(f"  Processed {i + 1}/{num_batches} dummy batches")
+
+    # Restore original training mode
+    if not was_training:
+        model.eval()
+
+    logger.info("Completed BN statistics adaptation with dummy input")
+    return model
+
+
 if __name__ == "__main__":
     # Unit test examples
     import doctest
