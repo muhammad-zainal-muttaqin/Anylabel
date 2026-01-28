@@ -45,30 +45,48 @@ augment_params = dict(
 
 **Untuk eksperimen depth:** A.2, A.3, A.4a, A.4b
 
-#### A.2, A.4a (3-Channel Depth) - Dummy Input
+#### A.2, A.4a (3-Channel Depth) - Real Training Images
 
-> **Note:** API Ultralytics berubah - `build_dataloader()` tidak lagi menerima parameter `imgsz`.
-> Solusi untuk A.2 dan A.4a: Menggunakan dummy input.
+> **Sesuai catatan dosen:** BN reset menggunakan **100 gambar training asli**.
 
 ```python
-def reset_bn_stats_dummy(model, num_batches=10, batch_size=16, device='cuda'):
-    """
-    Reset running stats BatchNorm menggunakan dummy input.
-    Dipanggil setelah load pretrained weights dan model.to(device).
-    """
-    model.train()
+import yaml
+from PIL import Image
+from torchvision import transforms
 
-    for module in model.modules():
-        if isinstance(module, nn.BatchNorm2d):
-            module.reset_running_stats()
-            module.momentum = 0.1
+# Load data config untuk dapat path training images
+with open(config_path) as f:
+    data_dict = yaml.safe_load(f)
 
-    dummy_input = torch.randn(batch_size, 3, 640, 640).to(device)
-    with torch.no_grad():
-        for i in range(num_batches):
-            _ = model(dummy_input)
+# Get training image paths
+train_path = Path(data_dict['path']) / data_dict['train']
+train_images = sorted(list(train_path.glob('*.png')) + list(train_path.glob('*.jpg')))
 
-    return model
+# Ambil 100 gambar (atau semua jika kurang dari 100)
+num_images = min(100, len(train_images))
+selected_images = train_images[:num_images]
+
+# Transform untuk preprocessing
+transform = transforms.Compose([
+    transforms.Resize((IMGSZ, IMGSZ)),
+    transforms.ToTensor(),
+])
+
+# Forward pass dengan real images (batch size 16)
+batch_size = 16
+with torch.no_grad():
+    for i in range(0, num_images, batch_size):
+        batch_paths = selected_images[i:i+batch_size]
+        batch_tensors = []
+
+        for img_path in batch_paths:
+            img = Image.open(img_path).convert('RGB')
+            img_tensor = transform(img)
+            batch_tensors.append(img_tensor)
+
+        if batch_tensors:
+            batch = torch.stack(batch_tensors).to(DEVICE)
+            _ = model.model(batch)
 ```
 
 #### A.3, A.4b (4-Channel RGBD) - Real Training Images
@@ -206,7 +224,7 @@ Input RGB (3ch)          Input Depth (3ch)
 
 ### Modul Baru
 
-- [x] `reset_bn.py` - Fungsi reset BatchNorm stats (dummy input method)
+- [x] `reset_bn.py` - Fungsi reset BatchNorm stats (100 real images method)
 - [x] `late_fusion_model.py` - Class LateFusionModel (multi-scale P3/P4/P5)
 - [x] `late_fusion_trainer.py` - Trainer khusus A.5 dengan v8DetectionLoss
 
@@ -242,7 +260,7 @@ Input RGB (3ch)          Input Depth (3ch)
 2. **Reset BN (Critical):**
    - Hanya untuk model depth (A.2-A.4b)
    - **Wajib** panggil `model.model.to(DEVICE)` sebelum reset BN
-   - Gunakan dummy input alih-alih dataloader (API berubah)
+   - Gunakan **100 gambar training asli** (bukan dummy input/random noise)
 
 3. **A.5 Input:** Dataloader memuat RGB dan Depth secara terpisah (2 path), bukan 4-channel fused.
 
@@ -279,9 +297,9 @@ Input RGB (3ch)          Input Depth (3ch)
 
 1. **Reset BN Method - A.2, A.4a (3-Channel)**
    - **Rencana:** Menggunakan `train_loader` dengan 100 batches
-   - **Implementasi:** Menggunakan `dummy_input` (random tensors) dengan 10 batches
-   - **Alasan:** API Ultralytics berubah, `build_dataloader()` tidak menerima `imgsz`
-   - **Impact:** Tetap valid untuk reset running statistics, lebih cepat
+   - **Implementasi:** Menggunakan **100 gambar training asli** via PIL + transforms
+   - **Alasan:** Sesuai instruksi dosen - domain adaptation lebih baik dengan real data
+   - **Impact:** Distribusi BN stats sesuai dengan data target (depth/synthetic)
 
 2. **Reset BN Method - A.3, A.4b (4-Channel RGBD)**
    - **Rencana:** Menggunakan dummy input
