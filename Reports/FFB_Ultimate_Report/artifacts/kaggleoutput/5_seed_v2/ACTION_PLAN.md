@@ -45,10 +45,10 @@ augment_params = dict(
 
 **Untuk eksperimen depth:** A.2, A.3, A.4a, A.4b
 
-**Implementasi (Dummy Input):**
+#### A.2, A.4a (3-Channel Depth) - Dummy Input
 
 > **Note:** API Ultralytics berubah - `build_dataloader()` tidak lagi menerima parameter `imgsz`.
-> Solusi: Menggunakan dummy input alih-alih dataloader.
+> Solusi untuk A.2 dan A.4a: Menggunakan dummy input.
 
 ```python
 def reset_bn_stats_dummy(model, num_batches=10, batch_size=16, device='cuda'):
@@ -58,34 +58,53 @@ def reset_bn_stats_dummy(model, num_batches=10, batch_size=16, device='cuda'):
     """
     model.train()
 
-    # Reset running stats
     for module in model.modules():
         if isinstance(module, nn.BatchNorm2d):
             module.reset_running_stats()
-            module.momentum = 0.1  # Higher momentum for faster adaptation
+            module.momentum = 0.1
 
-    # Forward pass dengan dummy input
     dummy_input = torch.randn(batch_size, 3, 640, 640).to(device)
     with torch.no_grad():
         for i in range(num_batches):
             _ = model(dummy_input)
 
-    print(f"✅ Reset BN stats: {num_batches} dummy batches")
     return model
 ```
 
-**Usage:**
+#### A.3, A.4b (4-Channel RGBD) - Real Training Images
+
+> **Sesuai catatan dosen:** BN reset menggunakan **100 gambar training asli** (bukan dummy).
+> Implementasi via callback `on_train_start` di `RGBD4ChTrainer`.
+
 ```python
-model = YOLO("yolo11n.pt")  # Load pretrained
-model.model.to(DEVICE)  # Pastikan model di GPU terlebih dahulu
-model.model = reset_bn_stats_dummy(model.model, num_batches=10, device=DEVICE)
-# Lanjut training
+class RGBD4ChTrainer(DetectionTrainer):
+    def __init__(self, overrides=None):
+        super().__init__(overrides=overrides)
+        self.add_callback("on_train_start", self._bn_reset_callback)
+
+    def _bn_reset_callback(self, trainer):
+        """Reset BN dengan 100 gambar training asli."""
+        # 1. Reset running stats
+        for module in self.model.modules():
+            if isinstance(module, nn.BatchNorm2d):
+                module.reset_running_stats()
+                module.momentum = 0.1
+
+        # 2. Forward pass 100 gambar training
+        device = next(self.model.parameters()).device
+        with torch.no_grad():
+            for batch in self.train_loader:
+                images = batch['img'].to(device)
+                if images.dtype == torch.uint8:
+                    images = images.float() / 255.0
+                _ = self.model(images)
 ```
 
-**Untuk RGBD (4-channel):**
-```python
-dummy_input = torch.randn(batch_size, 4, 640, 640).to(device)  # 4 channel
-```
+**Key Implementation Details:**
+- `super().__init__(overrides=overrides)` - explicit keyword argument (fix TypeError)
+- `images.float() / 255.0` - normalize uint8 ke float32 (fix ByteTensor error)
+- `int(self.model.stride.max())` - fix Tensor attribute error
+- `data=self.data` - fix NoneType error di build_dataset()
 
 ---
 
@@ -179,10 +198,10 @@ Input RGB (3ch)          Input Depth (3ch)
 ### Notebook v2 (Kaggle) - ✅ Semua Selesai
 
 - [x] `train_a1_rgb_v2.ipynb` - 5 seeds, uniform aug
-- [x] `train_a2_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset
-- [x] `train_a3_rgbd_v2.ipynb` - 5 seeds, uniform aug + BN reset (4ch)
-- [x] `train_a4a_synthetic_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset
-- [x] `train_a4b_rgbd_synthetic_v2.ipynb` - 5 seeds, uniform aug + BN reset (4ch)
+- [x] `train_a2_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset (dummy input)
+- [x] `train_a3_rgbd_v2.ipynb` - 5 seeds, uniform aug + **BN reset 100 real images** + RGBD4ChTrainer + RGBD4ChValidator
+- [x] `train_a4a_synthetic_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset (dummy input)
+- [x] `train_a4b_rgbd_synthetic_v2.ipynb` - 5 seeds, uniform aug + **BN reset 100 real images** + RGBD4ChTrainer + RGBD4ChValidator
 - [x] `train_a5_late_fusion_v2.ipynb` - 5 seeds, multi-scale fusion + proper YOLO loss
 
 ### Modul Baru
@@ -258,23 +277,43 @@ Input RGB (3ch)          Input Depth (3ch)
 
 **Perubahan Teknis dari Rencana Awal:**
 
-1. **Reset BN Method**
+1. **Reset BN Method - A.2, A.4a (3-Channel)**
    - **Rencana:** Menggunakan `train_loader` dengan 100 batches
    - **Implementasi:** Menggunakan `dummy_input` (random tensors) dengan 10 batches
    - **Alasan:** API Ultralytics berubah, `build_dataloader()` tidak menerima `imgsz`
-   - **Impact:** Tetap valid untuk reset running statistics, lebih cepat, tidak perlu setup dataloader
+   - **Impact:** Tetap valid untuk reset running statistics, lebih cepat
 
-2. **A.5 Arsitektur**
+2. **Reset BN Method - A.3, A.4b (4-Channel RGBD)**
+   - **Rencana:** Menggunakan dummy input
+   - **Implementasi:** Menggunakan **100 gambar training asli** via callback `on_train_start`
+   - **Alasan:** Sesuai catatan dosen - domain adaptation lebih baik dengan real data
+   - **Implementation:** `RGBD4ChTrainer` dengan `_bn_reset_callback()`
+
+3. **A.3, A.4b Custom Trainer Architecture**
+   - **RGBD4ChTrainer:**
+     - `get_model()` - Auto-convert 3ch → 4ch first conv layer
+     - `build_dataset()` - Override dengan `RGBDDataset` (4-channel `load_image()`)
+     - `_bn_reset_callback()` - BN reset dengan 100 real training images
+     - `get_validator()` - Return `RGBD4ChValidator`
+   - **RGBD4ChValidator:**
+     - `build_dataset()` - 4-channel dataset untuk validation
+     - `setup_model()` - Ensure 4ch conversion
+
+4. **Cell 8 Evaluation Fix**
+   - **Implementasi:** `evaluate_rgbd_model()` menggunakan `RGBD4ChValidator` eksplisit
+   - **Alasan:** `model.val()` default tidak handle 4-channel properly
+   - **Return:** `validator.metrics` (bukan return value dari `validator()`)
+
+5. **A.5 Arsitektur**
    - **Rencana:** Single-scale (P3 only) fusion
    - **Implementasi:** Multi-scale (P3, P4, P5) fusion
    - **Alasan:** YOLO Detect head memerlukan 3 level feature pyramid
-   - **Impact:** Lebih kompleks tapi lebih proper sesuai arsitektur YOLO
 
-3. **Device Transfer**
+6. **Device Transfer**
    - **Tambahan:** `model.model.to(DEVICE)` sebelum BN reset (penting!)
    - **Alasan:** Layer BN perlu di GPU sebelum forward pass
 
-4. **Metrics Access**
+7. **Metrics Access**
    - **Update:** `results.box.map50` alih-alih `results.results_dict['metrics/mAP50(B)']`
    - **Alasan:** API Ultralytics terbaru mengubah struktur results object
 
