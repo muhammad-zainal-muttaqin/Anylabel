@@ -192,7 +192,7 @@ erasing=0.0      # Disabled
 
 ### BatchNorm Reset (A.2, A.3, A.4a, A.4b)
 
-- **Method:** Forward pass 100 gambar training asli (bukan dummy)
+- **Method:** Forward pass 100 gambar training asli
 - **A.2, A.4a:** PIL + transforms, batch size 16
 - **A.3, A.4b:** Callback `on_train_start` dengan train_loader
 

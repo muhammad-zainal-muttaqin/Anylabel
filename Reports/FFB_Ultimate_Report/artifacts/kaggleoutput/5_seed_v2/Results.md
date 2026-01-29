@@ -441,7 +441,7 @@ A.4a (Syn Depth)   ████████████████████�
 ### 5.4 Technical Achievements
 
 1. **Uniform Augmentation:** Berhasil mengimplementasikan geometric-only augmentation untuk semua eksperimen
-2. **BN Reset:** Berhasil mengimplementasikan BN reset dengan 100 real training images (bukan dummy)
+2. **BN Reset:** Berhasil mengimplementasikan BN reset dengan 100 real training images
 3. **Fair Comparison:** Semua eksperimen sekarang menggunakan parameter training yang identik
 4. **A.5 Architecture:** Berhasil mengimplementasikan late fusion dengan dual frozen backbone
 

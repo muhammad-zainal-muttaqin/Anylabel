@@ -91,7 +91,7 @@ with torch.no_grad():
 
 #### A.3, A.4b (4-Channel RGBD) - Real Training Images
 
-> **Sesuai catatan dosen:** BN reset menggunakan **100 gambar training asli** (bukan dummy).
+> **Sesuai catatan dosen:** BN reset menggunakan **100 gambar training asli**.
 > Implementasi via callback `on_train_start` di `RGBD4ChTrainer`.
 
 ```python
@@ -260,7 +260,7 @@ Input RGB (3ch)          Input Depth (3ch)
 2. **Reset BN (Critical):**
    - Hanya untuk model depth (A.2-A.4b)
    - **Wajib** panggil `model.model.to(DEVICE)` sebelum reset BN
-   - Gunakan **100 gambar training asli** (bukan dummy input/random noise)
+   - Gunakan **100 gambar training asli**
 
 3. **A.5 Input:** Dataloader memuat RGB dan Depth secara terpisah (2 path), bukan 4-channel fused.
 
