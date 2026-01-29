@@ -207,18 +207,18 @@ Input RGB (3ch)          Input Depth (3ch)
 ### Script Training
 
 - [x] Update `train_a1_rgb.py` - augmentasi geometri-only
-- [x] Update `train_a2_depth.py` - augmentasi + reset BN (dummy input)
-- [x] Update `train_a3_rgbd.py` - augmentasi + reset BN (dummy input, 4ch)
-- [x] Update `train_a4a_synthetic_depth.py` - augmentasi + reset BN (dummy input)
-- [x] Update `train_a4b_rgbd_synthetic.py` - augmentasi + reset BN (dummy input, 4ch)
+- [x] Update `train_a2_depth.py` - augmentasi + reset BN (100 real images)
+- [x] Update `train_a3_rgbd.py` - augmentasi + reset BN (100 real images, 4ch)
+- [x] Update `train_a4a_synthetic_depth.py` - augmentasi + reset BN (100 real images)
+- [x] Update `train_a4b_rgbd_synthetic.py` - augmentasi + reset BN (100 real images, 4ch)
 - [x] Buat `train_a5_late_fusion.py` - model baru
 
 ### Notebook v2 (Kaggle) - ✅ Semua Selesai
 
 - [x] `train_a1_rgb_v2.ipynb` - 5 seeds, uniform aug
-- [x] `train_a2_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset (dummy input)
+- [x] `train_a2_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset (100 real images)
 - [x] `train_a3_rgbd_v2.ipynb` - 5 seeds, uniform aug + **BN reset 100 real images** + RGBD4ChTrainer + RGBD4ChValidator
-- [x] `train_a4a_synthetic_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset (dummy input)
+- [x] `train_a4a_synthetic_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset (100 real images)
 - [x] `train_a4b_rgbd_synthetic_v2.ipynb` - 5 seeds, uniform aug + **BN reset 100 real images** + RGBD4ChTrainer + RGBD4ChValidator
 - [x] `train_a5_late_fusion_v2.ipynb` - 5 seeds, multi-scale fusion + proper YOLO loss
 
