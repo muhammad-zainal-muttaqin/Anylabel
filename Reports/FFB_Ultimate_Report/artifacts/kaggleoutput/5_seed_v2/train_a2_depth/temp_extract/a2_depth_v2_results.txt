@@ -1,0 +1,49 @@
+============================================================
+A.2 Real Depth Only (V2) Results
+Generated: 2026-01-29 00:57:10
+Environment: Kaggle
+============================================================
+
+Configuration:
+  Model: YOLOv11n
+  Epochs: 100 (patience: 30)
+  Image Size: 640
+  Batch Size: 16
+  Seeds: [42, 123, 456, 789, 101]
+
+Uniform Augmentation:
+  translate: 0.1
+  scale: 0.5
+  fliplr: 0.5
+  hsv_h: 0.0
+  hsv_s: 0.0
+  hsv_v: 0.0
+  erasing: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  degrees: 0.0
+  copy_paste: 0.0
+
+Special Features:
+  - Reset BatchNorm statistics for depth domain adaptation
+
+============================================================
+Per-Seed Results:
+============================================================
+      mAP50  mAP50-95  Precision  Recall
+Seed                                    
+42   0.6908    0.2742     0.7001  0.7238
+123  0.7169    0.2987     0.6682  0.7479
+456  0.8005    0.3054     0.7636  0.7238
+789  0.7138    0.2881     0.6996  0.7238
+101  0.7402    0.2910     0.7419  0.7143
+
+------------------------------------------------------------
+Summary (Mean ± Std):
+------------------------------------------------------------
+  mAP50: 0.7325 ± 0.0419
+  mAP50-95: 0.2915 ± 0.0118
+  Precision: 0.7147 ± 0.0379
+  Recall: 0.7267 ± 0.0125
+
+Best Seed: 456

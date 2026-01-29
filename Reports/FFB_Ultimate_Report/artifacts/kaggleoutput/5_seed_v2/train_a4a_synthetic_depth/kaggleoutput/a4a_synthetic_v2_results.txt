@@ -1,0 +1,50 @@
+============================================================
+A.4a Synthetic Depth Only (V2) Results
+Generated: 2026-01-29 00:36:47
+Environment: Kaggle
+============================================================
+
+Configuration:
+  Model: YOLOv11n
+  Depth Source: Depth-Anything-V2 (Synthetic)
+  Epochs: 100 (patience: 30)
+  Image Size: 640
+  Batch Size: 16
+  Seeds: [42, 123, 456, 789, 101]
+
+Uniform Augmentation:
+  translate: 0.1
+  scale: 0.5
+  fliplr: 0.5
+  hsv_h: 0.0
+  hsv_s: 0.0
+  hsv_v: 0.0
+  erasing: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  degrees: 0.0
+  copy_paste: 0.0
+
+Special Features:
+  - Reset BatchNorm statistics for synthetic depth domain adaptation
+
+============================================================
+Per-Seed Results:
+============================================================
+      mAP50  mAP50-95  Precision  Recall
+Seed                                    
+42   0.6066    0.2333     0.7244  0.4952
+123  0.6309    0.2789     0.6483  0.7048
+456  0.6707    0.2762     0.7408  0.6190
+789  0.6577    0.2981     0.7291  0.5897
+101  0.7009    0.2906     0.7452  0.6762
+
+------------------------------------------------------------
+Summary (Mean ± Std):
+------------------------------------------------------------
+  mAP50: 0.6533 ± 0.0363
+  mAP50-95: 0.2754 ± 0.0252
+  Precision: 0.7176 ± 0.0396
+  Recall: 0.6170 ± 0.0818
+
+Best Seed: 101

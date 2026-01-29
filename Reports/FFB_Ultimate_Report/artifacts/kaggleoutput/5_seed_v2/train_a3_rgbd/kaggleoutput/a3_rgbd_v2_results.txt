@@ -1,0 +1,52 @@
+============================================================
+A.3 RGB+Depth (4-CH) (V2) Results
+Generated: 2026-01-29 00:23:09
+Environment: Kaggle
+============================================================
+
+Configuration:
+  Model: YOLOv11n
+  Input: 4-Channel (RGB+Depth)
+  Epochs: 100 (patience: 30)
+  Image Size: 640
+  Batch Size: 16
+  Seeds: [42, 123, 456, 789, 101]
+
+Uniform Augmentation:
+  translate: 0.1
+  scale: 0.5
+  fliplr: 0.5
+  hsv_h: 0.0
+  hsv_s: 0.0
+  hsv_v: 0.0
+  erasing: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  degrees: 0.0
+  copy_paste: 0.0
+
+Special Features:
+  - 4-Channel input (RGB+Depth)
+  - Custom RGBD4ChTrainer
+  - Reset BatchNorm for domain adaptation
+
+============================================================
+Per-Seed Results:
+============================================================
+      mAP50  mAP50-95  Precision  Recall
+Seed                                    
+42   0.8386    0.3549     0.8019  0.8000
+123  0.8344    0.3618     0.7939  0.7810
+456  0.8337    0.3798     0.7488  0.7666
+789  0.8681    0.3701     0.8838  0.7524
+101  0.8267    0.3770     0.7809  0.7714
+
+------------------------------------------------------------
+Summary (Mean ± Std):
+------------------------------------------------------------
+  mAP50: 0.8403 ± 0.0161
+  mAP50-95: 0.3687 ± 0.0104
+  Precision: 0.8019 ± 0.0501
+  Recall: 0.7743 ± 0.0177
+
+Best Seed: 789
