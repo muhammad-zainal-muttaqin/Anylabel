@@ -157,9 +157,9 @@
 | A.4b RGB+Synthetic | 0.0122 | Most Stable |
 | A.3 RGB+Real Depth | 0.0161 | Very Stable |
 | A.1 RGB Only | 0.0249 | Stable |
-| A.5 Late Fusion | 0.0304 | Moderate-High |
-| A.4a Synthetic Depth | 0.0363 | Moderate |
-| A.2 Real Depth | 0.0419 | Moderate |
+| A.5 Late Fusion | 0.0304 | Moderate |
+| A.4a Synthetic Depth | 0.0363 | Moderate-Low |
+| A.2 Real Depth | 0.0419 | Least Stable |
 
 ---
 

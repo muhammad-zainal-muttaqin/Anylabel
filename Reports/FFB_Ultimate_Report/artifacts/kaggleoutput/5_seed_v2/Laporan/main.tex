@@ -23,7 +23,7 @@
 \maketitle
 
 \begin{abstract}
-Automated detection of oil palm Fresh Fruit Bunches (FFBs) is essential for efficient harvesting operations. While RGB-based object detection has been widely studied, the potential contribution of depth information---either from hardware sensors or monocular depth estimation---remains underexplored for this domain. This paper presents a systematic comparison of six input configurations for FFB detection using YOLOv11n: RGB-only (A.1), real depth-only (A.2), early-fused RGB$+$real depth (A.3), synthetic depth-only (A.4a), early-fused RGB$+$synthetic depth (A.4b), and late fusion of dual backbones (A.5). All experiments are conducted under a unified augmentation protocol with five random seeds to ensure statistical robustness. Results show that early fusion of RGB with real depth (A.3) achieves the highest mAP50 of $0.8403 \pm 0.0161$, marginally outperforming the RGB-only baseline ($0.8385 \pm 0.0249$). Depth-only configurations perform substantially worse, with synthetic depth (A.4a, $0.6533$) falling below real depth (A.2, $0.7325$). These findings indicate that RGB remains the dominant modality, and depth fusion provides only marginal gains in the current experimental setting.
+Automated detection of oil palm Fresh Fruit Bunches (FFBs) is essential for efficient harvesting operations. While RGB-based object detection has been widely studied, the potential contribution of depth information---either from hardware sensors or monocular depth estimation---remains underexplored for this domain. This paper presents a systematic comparison of six input configurations for FFB detection using YOLOv11n: RGB-only (A.1), real depth-only (A.2), early-fused RGB$+$real depth (A.3), synthetic depth-only (A.4a), early-fused RGB$+$synthetic depth (A.4b), and late fusion of dual backbones (A.5). All experiments are conducted under a unified augmentation protocol with five random seeds to ensure statistical robustness. Results show that early fusion of RGB with real depth (A.3) achieves the highest mAP50 of $0.8403 \pm 0.0161$, marginally outperforming the RGB-only baseline ($0.8385 \pm 0.0249$). Late fusion (A.5) ranks fourth ($0.8084 \pm 0.0304$) with higher seed sensitivity, while depth-only configurations perform substantially worse, with synthetic depth (A.4a, $0.6533$) falling below real depth (A.2, $0.7325$). These findings indicate that RGB remains the dominant modality, early fusion outperforms late fusion, and depth fusion provides only marginal gains in the current experimental setting.
 \end{abstract}
 
 \section{Introduction}
@@ -216,17 +216,17 @@ Seed & mAP50 & mAP50--95 & Precision & Recall \\
 \caption{A.5 -- Late Fusion: per-seed results.}
 \label{tab:a5_seeds}
 \small
-\begin{tabular}{ccc}
+\begin{tabular}{ccccc}
 \toprule
-Seed & mAP50 & mAP50--95 \\
+Seed & mAP50 & mAP50--95 & Precision & Recall \\
 \midrule
-42  & 0.7610 & 0.2977 \\
-123 & 0.7955 & 0.3120 \\
-456 & 0.8279 & 0.3390 \\
-789 & 0.8347 & 0.3205 \\
-101 & 0.8229 & 0.3188 \\
+42  & 0.7610 & 0.2977 & 0.7106 & 0.7714 \\
+123 & 0.7955 & 0.3120 & 0.7594 & 0.7810 \\
+456 & 0.8279 & 0.3390 & 0.7911 & 0.8000 \\
+789 & 0.8347 & 0.3205 & 0.7803 & 0.7714 \\
+101 & 0.8229 & 0.3188 & 0.7684 & 0.7905 \\
 \midrule
-\textbf{Mean$\pm$Std} & \textbf{0.8084$\pm$0.030} & \textbf{0.3176$\pm$0.016} \\
+\textbf{Mean$\pm$Std} & \textbf{0.8084$\pm$0.030} & \textbf{0.3176$\pm$0.016} & \textbf{0.7620$\pm$0.030} & \textbf{0.7829$\pm$0.012} \\
 \bottomrule
 \end{tabular}
 \normalsize
@@ -276,6 +276,7 @@ A.2 (Real depth) & 0.748 & 0.733 & $-2.0\%$ & BN reset added \\
 A.3 (Real RGBD) & 0.842 & 0.840 & $-0.2\%$ & BN reset added \\
 A.4a (Synth.\ depth) & 0.708 & 0.653 & $-7.8\%$ & Sensitive to augmentation changes \\
 A.4b (RGB + synth.) & 0.813 & 0.823 & $+1.2\%$ & BN reset improves synthetic fusion \\
+A.5 (Late fusion) & N/A & 0.808 & New & Dual frozen backbones + fusion layers \\
 \bottomrule
 \end{tabularx}
 \normalsize

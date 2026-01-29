@@ -296,14 +296,14 @@ A.4a (Syn Depth)   ████████████████████�
 
 #### Standard Deviation Comparison (mAP50)
 
-| Experiment | Std Dev | Stability Rating |
-|:-----------|:-------:|:----------------:|
-| A.4b RGB+Synthetic | 0.0122 | Most Stable |
-| A.3 RGB+Real Depth | 0.0161 | Very Stable |
-| A.1 RGB Only | 0.0249 | Stable |
-| A.5 Late Fusion | 0.0304 | Moderate-High |
-| A.4a Synthetic Depth | 0.0363 | Moderate |
-| A.2 Real Depth | 0.0419 | Moderate |
+| Rank | Experiment | Std Dev | Stability Rating |
+|:----:|:-----------|:-------:|:----------------:|
+| 1 | A.4b RGB+Synthetic | 0.0122 | Most Stable |
+| 2 | A.3 RGB+Real Depth | 0.0161 | Very Stable |
+| 3 | A.1 RGB Only | 0.0249 | Stable |
+| 4 | A.5 Late Fusion | 0.0304 | Moderate |
+| 5 | A.4a Synthetic Depth | 0.0363 | Moderate-Low |
+| 6 | A.2 Real Depth | 0.0419 | Least Stable |
 
 ### 3.2 Input Modality Comparison
 
