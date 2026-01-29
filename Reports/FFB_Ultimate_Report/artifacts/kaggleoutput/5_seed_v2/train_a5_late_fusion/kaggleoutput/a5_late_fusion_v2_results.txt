@@ -1,0 +1,48 @@
+============================================================
+A.5 Late Fusion (V2) Results
+Generated: 2026-01-29 05:09:22
+Environment: Kaggle
+============================================================
+
+Configuration:
+  Architecture: Late Fusion (RGB + Depth)
+  RGB Backbone: Frozen (from A.1)
+  Depth Backbone: Frozen (from A.2)
+  Trainable: Fusion Layer + Detection Head
+  Model: YOLOv11n (backbones)
+  Epochs: 100 (patience: 30)
+  Image Size: 640
+  Batch Size: 16
+  Seeds: [42, 123, 456, 789, 101]
+
+Uniform Augmentation:
+  translate: 0.1
+  scale: 0.5
+  fliplr: 0.5
+  hsv_h: 0.0
+  hsv_s: 0.0
+  hsv_v: 0.0
+  erasing: 0.0
+  mosaic: 0.0
+  mixup: 0.0
+  degrees: 0.0
+  copy_paste: 0.0
+
+============================================================
+Per-Seed Results:
+============================================================
+      mAP50  mAP50-95
+Seed                 
+42   0.7610    0.2977
+123  0.7955    0.3120
+456  0.8279    0.3390
+789  0.8347    0.3205
+101  0.8229    0.3188
+
+------------------------------------------------------------
+Summary (Mean +/- Std):
+------------------------------------------------------------
+  mAP50: 0.8084 +/- 0.0304
+  mAP50-95: 0.3176 +/- 0.0149
+
+Best Seed: 789

@@ -1,28 +1,29 @@
-# 5 Seed Experiments - Version 2 (Action Plan)
+# 5 Seed Experiments - Version 2
 
 **Folder:** `5_seed_v2/`
 **Created:** 2026-01-28
-**Purpose:** Hasil re-run eksperimen dengan revisi dari dosen
+**Purpose:** Standardized experiments with uniform augmentation and domain adaptation
 
 ---
 
-## Perubahan dari 5_seed v1
+## Changes from 5_seed v1
 
-| Aspek | v1 (Lama) | v2 (Baru) |
+| Aspect | v1 (Legacy) | v2 (Current) |
 |:------|:----------|:----------|
-| **Augmentasi** | Mixed (A.1 default, A.3/A.4b HSV=0) | Seragam geometri-only (semua) |
-| **Reset BN** | Tidak ada | Ada untuk depth experiments |
-| **Late Fusion** | Tidak ada | A.5 (baru) |
+| **Augmentation** | Mixed (A.1 default, A.3/A.4b HSV=0) | Uniform geometric-only (all) |
+| **BN Reset** | Not applied | Applied for depth experiments |
+| **Late Fusion** | Not available | A.5 (new) |
 
 ---
 
-## Struktur Folder
+## Folder Structure
 
 ```
 5_seed_v2/
-├── README.md                          # File ini
-├── ACTION_PLAN.md                     # Detail rencana kerja
-├── Results_v3.md                      # (akan dibuat) Hasil akhir
+├── README.md                          # This file
+├── ACTION_PLAN.md                     # Detailed implementation plan
+├── Results.md                         # Full detailed results
+├── Results_v2.md                      # Concise summary
 │
 ├── train_a1_rgb/                      # A.1: RGB Only
 │   ├── runs/detect/exp_a1_rgb_seed{N}/
@@ -44,46 +45,47 @@
 │   ├── runs/detect/exp_a4b_rgbd_seed{N}/
 │   └── kaggleoutput/a4b_rgbd_results.txt
 │
-└── train_a5_late_fusion/              # A.5: Late Fusion (BARU)
+└── train_a5_late_fusion/              # A.5: Late Fusion (NEW)
     ├── runs/detect/exp_a5_fusion_seed{N}/
     └── kaggleoutput/a5_fusion_results.txt
 ```
 
 ---
 
-## Konfigurasi Training (v2)
+## Training Configuration (v2)
 
-### Augmentasi (Semua Eksperimen)
+### Augmentation (All Experiments)
 
 ```yaml
-translate: 0.1    # ✅ Aktif
-scale: 0.5        # ✅ Aktif
-fliplr: 0.5       # ✅ Aktif
-hsv_h: 0.0        # ❌ Disable
-hsv_s: 0.0        # ❌ Disable
-hsv_v: 0.0        # ❌ Disable
-erasing: 0.0      # ❌ Disable
-mosaic: 0.0       # ❌ Disable
-mixup: 0.0        # ❌ Disable
+translate: 0.1    # ✅ Enabled
+scale: 0.5        # ✅ Enabled
+fliplr: 0.5       # ✅ Enabled
+hsv_h: 0.0        # ❌ Disabled
+hsv_s: 0.0        # ❌ Disabled
+hsv_v: 0.0        # ❌ Disabled
+erasing: 0.0      # ❌ Disabled
+mosaic: 0.0       # ❌ Disabled
+mixup: 0.0        # ❌ Disabled
 ```
 
-### Reset BatchNorm (A.2, A.3, A.4a, A.4b)
+### BatchNorm Reset (A.2, A.3, A.4a, A.4b)
 
-- Forward pass: 100 batch training data
-- Setelah: load pretrained weights
-- Sebelum: training utama dimulai
+- Forward pass: 100 batches of training data
+- Timing: After loading pretrained weights, before main training
+- Method: Real training images (not synthetic/dummy data)
 
 ### Late Fusion (A.5)
 
-- Backbone RGB: Frozen (bobot A.1)
-- Backbone Depth: Frozen (bobot A.2)
+- RGB Backbone: Frozen (A.1 weights)
+- Depth Backbone: Frozen (A.2 weights)
 - Fusion layer: Trainable
+- Architecture: Multi-scale (P3, P4, P5) with 1x1 convolutions
 
 ---
 
 ## Seeds
 
-Semua eksperimen menggunakan 5 seeds:
+All experiments use 5 seeds for statistical reliability:
 
 ```python
 seeds = [42, 123, 456, 789, 101]
@@ -93,37 +95,64 @@ seeds = [42, 123, 456, 789, 101]
 
 ## Status
 
-| Eksperimen | Status | Seeds Completed |
+| Experiment | Status | Seeds Completed |
 |:-----------|:------:|:---------------:|
-| A.1 RGB | ⏳ Pending | 0/5 |
-| A.2 Depth | ⏳ Pending | 0/5 |
-| A.3 RGBD | ⏳ Pending | 0/5 |
-| A.4a Synthetic | ⏳ Pending | 0/5 |
-| A.4b RGBD Synthetic | ⏳ Pending | 0/5 |
-| A.5 Late Fusion | ⏳ Pending | 0/5 |
+| A.1 RGB | ✅ Complete | 5/5 |
+| A.2 Depth | ✅ Complete | 5/5 |
+| A.3 RGBD | ✅ Complete | 5/5 |
+| A.4a Synthetic | ✅ Complete | 5/5 |
+| A.4b RGBD Synthetic | ✅ Complete | 5/5 |
+| A.5 Late Fusion | ✅ Complete | 5/5 |
 
 **Legend:**
-- ⏳ Pending: Belum dikerjakan
-- 🔄 In Progress: Sedang berjalan
-- ✅ Completed: Selesai
+- ⏳ Pending: Not started
+- 🔄 In Progress: Running
+- ✅ Complete: Finished
 
 ---
 
-## Perbandingan dengan v1
+## Quick Results Summary
 
-| Metrik | v1 (Lama) | v2 (Baru - Estimasi) |
-|:-------|:---------:|:--------------------:|
-| A.1 RGB | 0.869±0.018 | ? (dengan augmentasi lebih keras) |
-| A.2 Depth | 0.748±0.038 | ? (+ reset BN) |
-| A.3 RGBD | 0.842±0.013 | ? (+ reset BN) |
-| A.4a Synthetic | 0.708±0.029 | ? (+ reset BN) |
-| A.4b RGBD Synth | 0.813±0.023 | ? (+ reset BN) |
-| **A.5 Late Fusion** | - | ? (model baru) |
+| Metric | Best Value | Experiment |
+|:-------|:----------:|:-----------|
+| **Best mAP50** | 0.8403 | A.3 (RGB+Real Depth) |
+| **RGB Baseline** | 0.8385 | A.1 (RGB Only) |
+| **Late Fusion** | 0.8084 | A.5 (Ranks #4) |
+| **Depth-Only Best** | 0.7325 | A.2 (Real Depth) |
+| **Most Stable** | 0.0122 std | A.4b (RGB+Synthetic) |
+
+### Comparison Table
+
+| Rank | Experiment | mAP50 | mAP50-95 | Std Dev | Status |
+|:----:|:-----------|:-----:|:--------:|:-------:|:------:|
+| 1 | A.3 RGB+Real Depth | 0.8403±0.0161 | 0.3687±0.0104 | 0.0161 | ✅ |
+| 2 | A.1 RGB Only | 0.8385±0.0249 | 0.3645±0.0111 | 0.0249 | ✅ |
+| 3 | A.4b RGB+Synthetic | 0.8233±0.0122 | 0.3676±0.0074 | 0.0122 | ✅ |
+| 4 | A.5 Late Fusion | 0.8084±0.0304 | 0.3176±0.0160 | 0.0304 | ✅ |
+| 5 | A.2 Real Depth | 0.7325±0.0419 | 0.2915±0.0118 | 0.0419 | ✅ |
+| 6 | A.4a Synthetic Depth | 0.6533±0.0363 | 0.2754±0.0252 | 0.0363 | ✅ |
+
+See `Results.md` and `Results_v2.md` for complete analysis.
 
 ---
 
-## Note
+## Documentation
 
-- Folder ini untuk hasil **baru** sesuai action plan dosen
-- Hasil lama tetap ada di `5_seed/` untuk referensi
-- A.5 adalah eksperimen baru yang tidak ada di v1
+| File | Description |
+|:-----|:------------|
+| `ACTION_PLAN.md` | Technical implementation details and architecture |
+| `Results.md` | Full detailed report with visualizations |
+| `Results_v2.md` | Concise summary and key findings |
+
+---
+
+## Notes
+
+- This folder contains **standardized** results with uniform parameters
+- Legacy results remain in `5_seed/` for reference
+- A.5 is a new experiment not present in v1
+- All experiments use identical training parameters for fair comparison
+
+---
+
+*For questions or issues, refer to the main repository documentation.*

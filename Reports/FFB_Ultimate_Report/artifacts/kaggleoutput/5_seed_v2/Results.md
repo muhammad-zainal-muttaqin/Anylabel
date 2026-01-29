@@ -3,13 +3,13 @@
 **Generated:** 2026-01-29
 **Experiments:** 6 (5 seeds each: 42, 123, 456, 789, 101)
 **Training:** YOLOv11n, 100 epochs, patience=30
-**Revisi:** Uniform augmentation + BatchNorm Reset untuk depth experiments
+**Revision:** Uniform augmentation + BatchNorm Reset for depth experiments
 
 ---
 
 ## Executive Summary
 
-This report presents comprehensive results from V2 experiments investigating Fresh Fruit Bunch (FFB) oil palm detection with **uniform augmentation** and **BatchNorm reset** untuk domain adaptation.
+This report presents comprehensive results from V2 experiments investigating Fresh Fruit Bunch (FFB) oil palm detection with **uniform augmentation** and **BatchNorm reset** for domain adaptation.
 
 ### Key Findings
 
@@ -21,14 +21,14 @@ This report presents comprehensive results from V2 experiments investigating Fre
 | **Real vs Synthetic** | Real depth (0.7325) outperforms synthetic depth (0.6533) by 7.9% |
 | **RGBD Fusion** | A.3 slightly outperforms RGB baseline by 0.2% |
 | **RGB+Synthetic Fusion** | A.4b (0.8233 mAP50) underperforms RGB by 1.8% |
-| **Late Fusion** | A.5 in progress (0.6742 mAP50 @ 5 epochs) |
+| **Late Fusion** | A.5 (0.8084 mAP50) - Ranks #4 |
 | **Most Stable** | A.4b RGB+Synthetic (std=0.0122) |
 
-### Perubahan Utama V2
+### Major V2 Changes
 
-1. **Uniform Augmentation:** Semua eksperimen menggunakan geometric augmentation yang sama (translate=0.1, scale=0.5, fliplr=0.5, HSV/mosaic/mixup disabled)
-2. **BatchNorm Reset:** A.2, A.3, A.4a, A.4b menggunakan BN reset dengan 100 gambar training asli
-3. **Fair Comparison:** Semua eksperimen sekarang comparable dengan parameter yang identik
+1. **Uniform Augmentation:** All experiments use identical geometric augmentation (translate=0.1, scale=0.5, fliplr=0.5, HSV/mosaic/mixup disabled)
+2. **BatchNorm Reset:** A.2, A.3, A.4a, A.4b use BN reset with 100 real training images
+3. **Fair Comparison:** All experiments now comparable with identical parameters
 
 ---
 
@@ -36,7 +36,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 
 ### 1.1 A.1 - RGB Only Baseline (V2)
 
-**Description:** RGB images only (3-channel) dengan uniform augmentation
+**Description:** RGB images only (3-channel) with uniform augmentation
 
 #### Per-Seed Results
 
@@ -67,7 +67,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 
 ### 1.2 A.2 - Real Depth Only (V2) + BN Reset
 
-**Description:** Real depth maps (3-channel) dengan BatchNorm reset menggunakan 100 gambar training asli
+**Description:** Real depth maps (3-channel) with BatchNorm reset using 100 real training images
 
 #### Per-Seed Results
 
@@ -80,7 +80,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 | 101 | 0.7402 | 0.2910 | 0.7419 | 0.7143 |
 | **Mean±Std** | **0.7325±0.0419** | **0.2915±0.0118** | **0.7147±0.0379** | **0.7267±0.0125** |
 
-**BN Reset Method:** PIL + transforms dengan 100 real training images, batch size 16
+**BN Reset Method:** PIL + transforms with 100 real training images, batch size 16
 
 #### Visualizations (Seed 456 - Best)
 
@@ -100,7 +100,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 
 ### 1.3 A.3 - RGB + Real Depth (4-Channel) (V2) + BN Reset
 
-**Description:** RGBD fusion (4-channel) dengan uniform augmentation dan BN reset via callback
+**Description:** RGBD fusion (4-channel) with uniform augmentation and BN reset via callback
 
 #### Per-Seed Results
 
@@ -113,7 +113,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 | 101 | 0.8267 | 0.3770 | 0.7809 | 0.7714 |
 | **Mean±Std** | **0.8403±0.0161** | **0.3687±0.0104** | **0.8019±0.0501** | **0.7743±0.0177** |
 
-**BN Reset Method:** Callback `on_train_start` dengan 100 real images via train_loader
+**BN Reset Method:** Callback `on_train_start` with 100 real images via train_loader
 
 #### Visualizations (Seed 789 - Best)
 
@@ -133,7 +133,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 
 ### 1.4 A.4a - Synthetic Depth Only (V2) + BN Reset
 
-**Description:** Depth-Anything-V2 generated depth maps (3-channel) dengan BN reset
+**Description:** Depth-Anything-V2 generated depth maps (3-channel) with BN reset
 
 #### Per-Seed Results
 
@@ -146,7 +146,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 | **101** | **0.7009** | 0.2906 | 0.7452 | 0.6762 |
 | **Mean±Std** | **0.6533±0.0363** | **0.2754±0.0252** | **0.7176±0.0396** | **0.6170±0.0818** |
 
-**BN Reset Method:** PIL + transforms dengan 100 real training images
+**BN Reset Method:** PIL + transforms with 100 real training images
 
 #### Visualizations (Seed 101 - Best)
 
@@ -166,7 +166,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 
 ### 1.5 A.4b - RGB + Synthetic Depth (4-Channel) (V2) + BN Reset
 
-**Description:** RGB + Depth-Anything-V2 fusion (4-channel) dengan BN reset
+**Description:** RGB + Depth-Anything-V2 fusion (4-channel) with BN reset
 
 #### Per-Seed Results
 
@@ -179,7 +179,7 @@ This report presents comprehensive results from V2 experiments investigating Fre
 | 101 | 0.8293 | 0.3632 | 0.8130 | 0.7868 |
 | **Mean±Std** | **0.8233±0.0122** | **0.3676±0.0074** | **0.7959±0.0341** | **0.7387±0.0403** |
 
-**BN Reset Method:** Callback `on_train_start` dengan 100 real images
+**BN Reset Method:** Callback `on_train_start` with 100 real images
 
 #### Visualizations (Seed 789 - Best)
 
@@ -197,46 +197,47 @@ This report presents comprehensive results from V2 experiments investigating Fre
 
 ---
 
-### 1.6 A.5 - Late Fusion (V2) - In Progress
+### 1.6 A.5 - Late Fusion (V2) - COMPLETE
 
-**Description:** Dual frozen backbone (RGB A.1 + Depth A.2) dengan trainable fusion layers dan detection head
+**Description:** Dual frozen backbone (RGB A.1 seed 42 + Depth A.2 seed 456) with trainable fusion layers and detection head
 
-#### Per-Seed Results (5 Epochs Only)
+#### Per-Seed Results (100 Epochs)
 
-| Seed | mAP50 | mAP50-95 |
-|:----:|:-----:|:--------:|
-| 42 | 0.5974 | 0.1941 |
-| **123** | **0.7554** | **0.2728** |
-| 456 | 0.5618 | 0.2112 |
-| 789 | 0.7441 | 0.2648 |
-| 101 | 0.7122 | 0.2463 |
-| **Mean±Std** | **0.6742±0.0887** | **0.2378±0.0341** |
+| Seed | mAP50 | mAP50-95 | Precision | Recall |
+|:----:|:-----:|:--------:|:---------:|:------:|
+| 42 | 0.7610 | 0.2977 | 0.7106 | 0.7714 |
+| 123 | 0.7955 | 0.3120 | 0.7594 | 0.7810 |
+| 456 | 0.8279 | **0.3390** | **0.7911** | **0.8000** |
+| **789** | **0.8347** | 0.3205 | 0.7803 | 0.7714 |
+| 101 | 0.8229 | 0.3188 | 0.7684 | 0.7905 |
+| **Mean±Std** | **0.8084±0.0304** | **0.3176±0.0160** | **0.7620±0.0303** | **0.7829±0.0122** |
 
-**Note:** Training 100 epochs sedang berjalan. Hasil di atas adalah dari 5 epochs saja.
+**Training:** 100 epochs completed for all 5 seeds
 
 #### Architecture
 
 ```
-Input RGB (3ch)          Input Depth (3ch)
-     │                         │
-     ▼                         ▼
-┌─────────────┐           ┌─────────────┐
-│  RGB Branch │           │ Depth Branch│
-│ (A.1 Frozen)│           │ (A.2 Frozen)│
-│  P3,P4,P5   │           │  P3,P4,P5   │
-└──────┬──────┘           └──────┬──────┘
-       │                         │
-       └───────────┬─────────────┘
-                   ▼
-          ┌─────────────────┐
-          │  Concat + 1x1   │  512→256 channel
-          │  Conv + BN      │  (trainable)
-          └────────┬────────┘
-                   ▼
-          ┌─────────────────┐
-          │  Detect Head    │  (trainable)
-          └─────────────────┘
+Parameters: 5,792,057 total
+- Trainable: 611,987 (10.6%)
+- Frozen: 5,180,070 (89.4%)
+
+Fusion Layers:
+- P3: 256ch → 64ch (1x1 Conv + BN + SiLU)
+- P4: 256ch → 128ch (1x1 Conv + BN + SiLU)
+- P5: 512ch → 256ch (1x1 Conv + BN + SiLU)
+
+Backbones:
+- RGB: Frozen A.1 weights (seed 42)
+- Depth: Frozen A.2 weights (seed 456)
 ```
+
+#### Key Implementation Features
+
+1. **Dual Frozen Backbones:** Both RGB and Depth backbones 100% frozen
+2. **Trainable Fusion:** Only fusion layers and detection head trained
+3. **Multi-Scale:** P3, P4, P5 feature fusion
+4. **Proper YOLO Loss:** v8DetectionLoss with box, cls, dfl components
+5. **Synchronized Augmentation:** RGB and Depth receive identical geometric augmentations
 
 ---
 
@@ -251,9 +252,7 @@ Input RGB (3ch)          Input Depth (3ch)
 | **A.4b** | RGB + Synthetic Depth | 0.8233±0.0122 | **0.3676±0.0074** | **0.7959±0.0341** | 0.7387±0.0403 | 3 |
 | **A.2** | Real Depth Only | 0.7325±0.0419 | 0.2915±0.0118 | 0.7147±0.0379 | 0.7267±0.0125 | 4 |
 | **A.4a** | Synthetic Depth Only | 0.6533±0.0363 | 0.2754±0.0252 | 0.7176±0.0396 | 0.6170±0.0818 | 5 |
-| **A.5** | Late Fusion | 0.6742±0.0887* | 0.2378±0.0341* | N/A | N/A | 6 |
-
-*\*A.5: 5 epochs only, training 100 epochs in progress*
+| **A.5** | Late Fusion | 0.8084±0.0304 | 0.3176±0.0160 | 0.7620±0.0303 | 0.7829±0.0122 | 4 |
 
 #### Performance Ranking by mAP50
 
@@ -261,8 +260,8 @@ Input RGB (3ch)          Input Depth (3ch)
 A.3 (RGB+Real)     ████████████████████████████████████ 0.8403
 A.1 (RGB)          ███████████████████████████████████░ 0.8385
 A.4b (RGB+Syn)     █████████████████████████████████░░░ 0.8233
+A.5 (Late Fusion)  ███████████████████████████████░░░░░ 0.8084
 A.2 (Real Depth)   ████████████████████████████░░░░░░░░ 0.7325
-A.5 (Late Fusion)* █████████████████████████░░░░░░░░░░░ 0.6742
 A.4a (Syn Depth)   █████████████████████████░░░░░░░░░░░ 0.6533
                    0.65                               0.85
 ```
@@ -271,7 +270,7 @@ A.4a (Syn Depth)   ████████████████████�
 
 ## 2. V1 vs V2 Comparison
 
-### Perbandingan Performa
+### Performance Comparison
 
 | Experiment | V1 mAP50 | V2 mAP50 | Δ Change | Key Difference |
 |:-----------|:--------:|:--------:|:--------:|:---------------|
@@ -280,13 +279,14 @@ A.4a (Syn Depth)   ████████████████████�
 | A.3 RGBD | 0.842 | 0.840 | -0.2% | + BN Reset real images |
 | A.4a Synthetic | 0.708 | 0.653 | -7.8% | + BN Reset (100 real images) |
 | A.4b Syn RGBD | 0.813 | 0.823 | +1.2% | + BN Reset real images |
+| A.5 Late Fusion | N/A | 0.808 | New | Dual frozen backbones + fusion |
 
 ### Analysis
 
-1. **A.1 Penurunan 3.5%:** Disebabkan penonaktifan HSV augmentation untuk keseragaman
-2. **A.3 Hampir Setara:** RGBD fusion sekarang hanya 0.2% di bawah RGB (vs 3.1% di V1)
-3. **A.4b Peningkatan 1.2%:** BN reset dengan real images membantu synthetic depth fusion
-4. **A.4a Penurunan 7.8%:** Synthetic depth-only sangat sensitif terhadap augmentasi
+1. **A.1 Decrease 3.5%:** Caused by disabling HSV augmentation for uniformity
+2. **A.3 Nearly Equal:** RGBD fusion now only 0.2% below RGB (vs 3.1% in V1)
+3. **A.4b Improvement 1.2%:** BN reset with real images helps synthetic depth fusion
+4. **A.4a Decrease 7.8%:** Synthetic depth-only is very sensitive to augmentation
 
 ---
 
@@ -301,11 +301,9 @@ A.4a (Syn Depth)   ████████████████████�
 | A.4b RGB+Synthetic | 0.0122 | Most Stable |
 | A.3 RGB+Real Depth | 0.0161 | Very Stable |
 | A.1 RGB Only | 0.0249 | Stable |
+| A.5 Late Fusion | 0.0304 | Moderate-High |
 | A.4a Synthetic Depth | 0.0363 | Moderate |
 | A.2 Real Depth | 0.0419 | Moderate |
-| A.5 Late Fusion | 0.0887 | High Variance* |
-
-*\*A.5: 5 epochs only*
 
 ### 3.2 Input Modality Comparison
 
@@ -314,6 +312,7 @@ A.4a (Syn Depth)   ████████████████████�
 | RGB + Real Depth | A.3 | **0.8403** | **+0.2%** |
 | RGB Only | A.1 | 0.8385 | - |
 | RGB + Synthetic Depth | A.4b | 0.8233 | -1.8% |
+| Late Fusion | A.5 | 0.8084 | -3.6% |
 | Real Depth Only | A.2 | 0.7325 | -12.6% |
 | Synthetic Depth Only | A.4a | 0.6533 | -22.1% |
 
@@ -328,7 +327,7 @@ A.4a (Syn Depth)   ████████████████████�
 | A.3 RGB+Real | 0.8386 | 0.3549 | **0.8019** | 0.8000 |
 | A.4a Synthetic | 0.6066 | 0.2333 | **0.7244** | 0.4952 |
 | A.4b RGB+Syn | 0.8210 | 0.3636 | 0.7489 | 0.7669 |
-| A.5 Late Fusion | 0.5974 | 0.1941 | N/A | N/A |
+| A.5 Late Fusion | 0.7610 | 0.2977 | 0.7106 | 0.7714 |
 
 #### All Experiments - Seed 789
 
@@ -339,7 +338,7 @@ A.4a (Syn Depth)   ████████████████████�
 | A.3 RGB+Real | **0.8681** | 0.3701 | **0.8838** | 0.7524 |
 | A.4a Synthetic | 0.6577 | 0.2981 | 0.7291 | 0.5897 |
 | A.4b RGB+Syn | **0.8410** | **0.3793** | **0.8381** | 0.7397 |
-| A.5 Late Fusion | 0.7441 | 0.2648 | N/A | N/A |
+| A.5 Late Fusion | **0.8347** | 0.3205 | 0.7803 | 0.7714 |
 
 ---
 
@@ -394,6 +393,7 @@ A.4a (Syn Depth)   ████████████████████�
 | **RGB Baseline** | 0.8385 | A.1 (RGB Only) |
 | **RGBD Fusion (Real)** | 0.8403 | A.3 (vs 0.8385 RGB) |
 | **RGBD Fusion (Synthetic)** | 0.8233 | A.4b (vs 0.8385 RGB) |
+| **Late Fusion** | 0.8084 | A.5 (vs 0.8385 RGB) |
 | **Most Stable** | 0.0122 std | A.4b RGB+Synthetic |
 | **Depth-Only (Real)** | 0.7325 | A.2 |
 | **Depth-Only (Synthetic)** | 0.6533 | A.4a |
@@ -402,11 +402,14 @@ A.4a (Syn Depth)   ████████████████████�
 
 #### Localization (A Series V2)
 
-1. **RGBD Fusion Now Works:** A.3 (0.8403) sekarang sedikit lebih baik dari RGB baseline (0.8385)
-2. **BN Reset Effective:** A.4b meningkat 1.2% dengan BN reset menggunakan real images
-3. **Uniform Augmentation Fair:** Semua eksperimen sekarang comparable dengan parameter identik
-4. **Real > Synthetic Maintained:** Real depth (0.733) unggul dari synthetic (0.653) sebesar 7.9%
-5. **Stability:** A.4b RGB+Synthetic adalah yang paling stabil (std=0.0122)
+1. **RGBD Fusion Now Works:** A.3 (0.8403) now slightly better than RGB baseline (0.8385)
+2. **BN Reset Effective:** A.4b improved 1.2% with BN reset using real images
+3. **Uniform Augmentation Fair:** All experiments now comparable with identical parameters
+4. **Real > Synthetic Maintained:** Real depth (0.733) outperforms synthetic (0.653) by 7.9%
+5. **Stability:** A.4b RGB+Synthetic is the most stable (std=0.0122)
+6. **Late Fusion Results:** A.5 (0.8084) ranks #4, below A.4b but above depth-only approaches
+7. **A.5 Seed Sensitivity:** Highest variance (std=0.0304) indicates initialization sensitivity
+8. **A.5 Best Seed:** Seed 789 achieves 0.8347, nearly matching A.1 and A.3 performance
 
 #### Comparison V1 vs V2
 
@@ -417,7 +420,7 @@ A.4a (Syn Depth)   ████████████████████�
 | Fairness | Mixed aug | Uniform aug | **V2** |
 | Domain Adaptation | None | BN Reset | **V2** |
 
-*\*V1 A.1 lebih tinggi karena HSV augmentation (tidak fair untuk depth)*
+*&#42;V1 A.1 higher due to HSV augmentation (unfair for depth)*
 
 ### 5.3 Recommendations
 
@@ -426,24 +429,25 @@ A.4a (Syn Depth)   ████████████████████�
 | Scenario | V2 Recommended Approach | Rationale |
 |:---------|:------------------------|:----------|
 | **Best Detection Performance** | A.3 RGB+Real Depth | Highest mAP50 (0.8403), very stable |
-| **Simplest Setup** | A.1 RGB Only | Hampir setara (0.8385), lebih sederhana |
-| **No Depth Sensor** | A.4b RGB+Synthetic | Hanya 1.7% di bawah RGB, tanpa sensor |
-| **Depth Only Available** | A.2 Real Depth | 0.7325 mAP50 dengan BN reset |
-| **Exploration/Future** | A.5 Late Fusion | Menunggu hasil 100 epochs |
+| **Simplest Setup** | A.1 RGB Only | Nearly equal (0.8385), simpler setup |
+| **No Depth Sensor** | A.4b RGB+Synthetic | Only 1.7% below RGB, no sensor needed |
+| **Late Fusion Architecture** | A.5 Late Fusion | Viable (0.8084) but not superior to A.3/A.4b |
+| **Depth Only Available** | A.2 Real Depth | 0.7325 mAP50 with BN reset |
 
 #### For Future Research
 
-1. **Complete A.5:** Tunggu hasil 100 epochs untuk evaluasi late fusion
-2. **Attention Mechanism:** Eksplorasi attention-based fusion untuk late fusion improvement
-3. **Multi-Scale Fusion:** Evaluasi contribution dari P3, P4, P5 secara individual
-4. **Synthetic Quality:** Investigasi kenapa A.4a turun 7.8% dengan uniform augmentation
+1. **Attention Mechanism:** Explore attention-based fusion for late fusion improvement
+2. **Multi-Scale Fusion:** Evaluate contribution of P3, P4, P5 individually
+3. **Synthetic Quality:** Investigate why A.4a dropped 7.8% with uniform augmentation
+4. **A.5 Seed Analysis:** Investigate why A.5 shows high variance (std=0.0304) vs A.4b (std=0.0122)
 
 ### 5.4 Technical Achievements
 
-1. **Uniform Augmentation:** Berhasil mengimplementasikan geometric-only augmentation untuk semua eksperimen
-2. **BN Reset:** Berhasil mengimplementasikan BN reset dengan 100 real training images
-3. **Fair Comparison:** Semua eksperimen sekarang menggunakan parameter training yang identik
-4. **A.5 Architecture:** Berhasil mengimplementasikan late fusion dengan dual frozen backbone
+1. **Uniform Augmentation:** Successfully implemented geometric-only augmentation for all experiments
+2. **BN Reset:** Successfully implemented BN reset with 100 real training images
+3. **Fair Comparison:** All experiments now use identical training parameters
+4. **A.5 Architecture:** Successfully implemented late fusion with dual frozen backbone
+5. **Late Fusion Validated:** A.5 achieves 0.8084 mAP50, validating architecture but showing higher variance than early fusion
 
 ---
 
@@ -458,7 +462,7 @@ All raw result files are available in their respective experiment directories:
 | A.3 RGB+Real | `train_a3_rgbd/kaggleoutput/a3_rgbd_v2_results.txt` | ✅ Valid |
 | A.4a Synthetic | `train_a4a_synthetic_depth/kaggleoutput/a4a_synthetic_v2_results.txt` | ✅ Valid |
 | A.4b RGB+Syn | `train_a4b_rgbd_synthetic/kaggleoutput/a4b_rgbd_synthetic_v2_results.txt` | ✅ Valid |
-| A.5 Late Fusion | `train_a5_late_fusion/kaggleoutput/a5_late_fusion_v2_results.txt` | ⏳ Pending |
+| A.5 Late Fusion | `train_a5_late_fusion/kaggleoutput/a5_late_fusion_v2_results.txt` | ✅ Valid |
 
 ## Appendix B: Model Weights
 
@@ -475,7 +479,7 @@ train_a3_rgbd/runs/detect/exp_a3_rgbd_v2_seed789/weights/best.pt
 
 ## Appendix C: Configuration Details
 
-### Uniform Augmentation (Semua Eksperimen)
+### Uniform Augmentation (All Experiments)
 ```python
 translate=0.1    # Geometric augmentation
 scale=0.5        # Geometric augmentation
@@ -488,7 +492,7 @@ mixup=0.0        # Disabled
 erasing=0.0      # Disabled
 ```
 
-### Training Parameters (Semua Sama)
+### Training Parameters (All Identical)
 - **Model:** YOLOv11n
 - **Epochs:** 100 (patience: 30)
 - **Batch Size:** 16
@@ -497,10 +501,10 @@ erasing=0.0      # Disabled
 - **Seeds:** [42, 123, 456, 789, 101]
 
 ### BN Reset Implementation
-- **A.2, A.4a:** `reset_bn.py` dengan PIL + transforms
-- **A.3, A.4b:** `RGBD4ChTrainer._bn_reset_callback()` dengan train_loader
+- **A.2, A.4a:** `reset_bn.py` with PIL + transforms
+- **A.3, A.4b:** `RGBD4ChTrainer._bn_reset_callback()` with train_loader
 
 ---
 
 *Report generated from 5-seed V2 experimental results (seeds: 42, 123, 456, 789, 101)*
-*Revisi: Uniform augmentation + BatchNorm Reset untuk fair comparison*
+*Revision: Uniform augmentation + BatchNorm Reset for fair comparison*

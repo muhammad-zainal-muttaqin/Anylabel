@@ -1,60 +1,61 @@
-# Action Plan: Revisi Eksperimen FFB Oil Palm Detection
+# Action Plan: FFB Oil Palm Detection Experiments V2
 
-**Dibuat:** 2026-01-28
-**Berdasarkan:** Catatan Dosen Penelitian
+**Created:** 2026-01-28
+**Version:** 2.0
+**Objective:** Standardized experiments with uniform augmentation and domain adaptation
 
 ---
 
-## Ringkasan Perubahan
+## Summary of Changes
 
-| Poin | Perubahan | Eksperimen Terdampak |
+| Point | Change | Affected Experiments |
 |:-----|:----------|:---------------------|
-| 1 | Augmentasi seragam (geometri-only) | A.1, A.2, A.3, A.4a, A.4b |
-| 2 | Reset BatchNorm stats | A.2, A.3, A.4a, A.4b |
-| 3 | Late Fusion Model baru | A.5 (baru) |
+| 1 | Uniform geometric augmentation | A.1, A.2, A.3, A.4a, A.4b |
+| 2 | BatchNorm statistics reset | A.2, A.3, A.4a, A.4b |
+| 3 | Late Fusion Model | A.5 (new) |
 
-**B Series (B.1, B.2):** Tidak berubah (sudah benar)
+**B Series (B.1, B.2):** Unchanged (baseline established)
 
 ---
 
-## Detail Perubahan
+## Change Details
 
-### 1. Augmentasi Seragam (Semua Eksperimen)
+### 1. Uniform Augmentation (All Experiments)
 
-**Konfigurasi uniform:**
+**Configuration:**
 
 ```python
 augment_params = dict(
-    translate=0.1,    # geometri ✅
-    scale=0.5,        # geometri ✅
-    fliplr=0.5,       # geometri ✅
-    hsv_h=0.0,        # 0 (non-geometri)
-    hsv_s=0.0,        # 0 (non-geometri)
-    hsv_v=0.0,        # 0 (non-geometri)
-    erasing=0.0,      # 0 (non-geometri)
-    mosaic=0.0,       # 0 (non-geometri)
-    mixup=0.0,        # 0 (non-geometri)
+    translate=0.1,    # geometric
+    scale=0.5,        # geometric
+    fliplr=0.5,       # geometric
+    hsv_h=0.0,        # disabled (non-geometric)
+    hsv_s=0.0,        # disabled (non-geometric)
+    hsv_v=0.0,        # disabled (non-geometric)
+    erasing=0.0,      # disabled (non-geometric)
+    mosaic=0.0,       # disabled (non-geometric)
+    mixup=0.0,        # disabled (non-geometric)
 )
 ```
 
-**Terdampak:** A.1, A.2, A.3, A.4a, A.4b (semua 5 seeds)
+**Affected:** A.1, A.2, A.3, A.4a, A.4b (all 5 seeds each)
 
 ---
 
 ### 2. Reset BatchNorm Running Stats
 
-**Untuk eksperimen depth:** A.2, A.3, A.4a, A.4b
+**For depth experiments:** A.2, A.3, A.4a, A.4b
 
 #### A.2, A.4a (3-Channel Depth) - Real Training Images
 
-> **Sesuai catatan dosen:** BN reset menggunakan **100 gambar training asli**.
+> **Implementation:** BN reset using **100 real training images**.
 
 ```python
 import yaml
 from PIL import Image
 from torchvision import transforms
 
-# Load data config untuk dapat path training images
+# Load data config to get training image paths
 with open(config_path) as f:
     data_dict = yaml.safe_load(f)
 
@@ -62,17 +63,17 @@ with open(config_path) as f:
 train_path = Path(data_dict['path']) / data_dict['train']
 train_images = sorted(list(train_path.glob('*.png')) + list(train_path.glob('*.jpg')))
 
-# Ambil 100 gambar (atau semua jika kurang dari 100)
+# Select 100 images (or all if less than 100)
 num_images = min(100, len(train_images))
 selected_images = train_images[:num_images]
 
-# Transform untuk preprocessing
+# Transform for preprocessing
 transform = transforms.Compose([
     transforms.Resize((IMGSZ, IMGSZ)),
     transforms.ToTensor(),
 ])
 
-# Forward pass dengan real images (batch size 16)
+# Forward pass with real images (batch size 16)
 batch_size = 16
 with torch.no_grad():
     for i in range(0, num_images, batch_size):
@@ -91,8 +92,7 @@ with torch.no_grad():
 
 #### A.3, A.4b (4-Channel RGBD) - Real Training Images
 
-> **Sesuai catatan dosen:** BN reset menggunakan **100 gambar training asli**.
-> Implementasi via callback `on_train_start` di `RGBD4ChTrainer`.
+> **Implementation:** BN reset using **100 real training images** via callback `on_train_start` in `RGBD4ChTrainer`.
 
 ```python
 class RGBD4ChTrainer(DetectionTrainer):
@@ -101,14 +101,14 @@ class RGBD4ChTrainer(DetectionTrainer):
         self.add_callback("on_train_start", self._bn_reset_callback)
 
     def _bn_reset_callback(self, trainer):
-        """Reset BN dengan 100 gambar training asli."""
+        """Reset BN with 100 real training images."""
         # 1. Reset running stats
         for module in self.model.modules():
             if isinstance(module, nn.BatchNorm2d):
                 module.reset_running_stats()
                 module.momentum = 0.1
 
-        # 2. Forward pass 100 gambar training
+        # 2. Forward pass 100 training images
         device = next(self.model.parameters()).device
         with torch.no_grad():
             for batch in self.train_loader:
@@ -120,15 +120,15 @@ class RGBD4ChTrainer(DetectionTrainer):
 
 **Key Implementation Details:**
 - `super().__init__(overrides=overrides)` - explicit keyword argument (fix TypeError)
-- `images.float() / 255.0` - normalize uint8 ke float32 (fix ByteTensor error)
+- `images.float() / 255.0` - normalize uint8 to float32 (fix ByteTensor error)
 - `int(self.model.stride.max())` - fix Tensor attribute error
-- `data=self.data` - fix NoneType error di build_dataset()
+- `data=self.data` - fix NoneType error in build_dataset()
 
 ---
 
 ### 3. Late Fusion Model (A.5)
 
-**Arsitektur Multi-Scale (P3, P4, P5):**
+**Multi-Scale Architecture (P3, P4, P5):**
 
 ```
 Input RGB (3ch)          Input Depth (3ch)
@@ -136,7 +136,7 @@ Input RGB (3ch)          Input Depth (3ch)
      ▼                         ▼
 ┌─────────────┐           ┌─────────────┐
 │  RGB Branch │           │ Depth Branch│
-│  (A.1 Frozen)│          │ (A.2 Frozen)│
+│ (A.1 Frozen)│           │ (A.2 Frozen)│
 │  Backbone   │           │  Backbone   │
 │  Outputs:   │           │  Outputs:   │
 │  P3, P4, P5 │           │  P3, P4, P5 │
@@ -145,7 +145,7 @@ Input RGB (3ch)          Input Depth (3ch)
        ├───────┬───────┬─────────┤
        │       │       │         │
        ▼       ▼       ▼         ▼
-    [Concat] [Concat] [Concat]  ← Tiap scale
+    [Concat] [Concat] [Concat]  ← Each scale
        │       │       │
        ▼       ▼       ▼
    1x1 Conv 1x1 Conv 1x1 Conv   ← Fusion layers (trainable)
@@ -159,81 +159,81 @@ Input RGB (3ch)          Input Depth (3ch)
        └───────────────┘
 ```
 
-**Spesifikasi:**
-- Cabang RGB: Load weights A.1, freeze 100%
-- Cabang Depth: Load weights A.2, freeze 100%
-- Fusion layers: 3 layer Conv2d 512→256 + BatchNorm + SiLU (P3, P4, P5)
-- Detection head: YOLOv11 Detect head trainable dari awal
+**Specifications:**
+- RGB Branch: Load A.1 weights, freeze 100%
+- Depth Branch: Load A.2 weights, freeze 100%
+- Fusion layers: 3 Conv2d layers 512→256 + BatchNorm + SiLU (P3, P4, P5)
+- Detection head: YOLOv11 Detect head trainable from scratch
 - Loss: v8DetectionLoss (box_loss + cls_loss + dfl_loss)
 
-**Catatan:** Arsitektur menggunakan multi-scale (P3, P4, P5) agar kompatibel dengan YOLO Detect head yang memerlukan 3 level feature pyramid.
+**Note:** Architecture uses multi-scale (P3, P4, P5) for compatibility with YOLO Detect head requiring 3-level feature pyramid.
 
 **Training:**
-- Epoch: 100 (atau sesuai setting A.1/A.2)
+- Epochs: 100 (matching A.1/A.2 settings)
 - Seeds: 42, 123, 456, 789, 101
 
 ---
 
-## Total Run Training
+## Total Training Runs
 
-| Eksperimen | Seeds | Augmentasi Baru | Reset BN | Status |
-|:-----------|:-----:|:---------------:|:--------:|:-------|
+| Experiment | Seeds | New Augmentation | BN Reset | Status |
+|:-----------|:-----:|:----------------:|:--------:|:-------|
 | A.1 RGB Only | 5 | ✅ | - | Re-run |
 | A.2 Real Depth | 5 | ✅ | ✅ | Re-run |
 | A.3 RGB+Real Depth | 5 | ✅ | ✅ | Re-run |
 | A.4a Synthetic Depth | 5 | ✅ | ✅ | Re-run |
 | A.4b RGB+Synthetic | 5 | ✅ | ✅ | Re-run |
-| **A.5 Late Fusion** | **5** | ✅ | - | **Baru** |
+| **A.5 Late Fusion** | **5** | ✅ | - | **New** |
 | **Total** | **30 runs** | | | |
 
 ---
 
-## Timeline Estimasi
+## Estimated Timeline
 
-| Tahap | Durasi | Keterangan |
-|:------|:-------|:-----------|
-| Update script augmentasi | 2-3 jam | Modifikasi 5 training script |
-| Implementasi reset BN | 2-3 jam | Tambah fungsi + integrasi |
-| Implementasi A.5 | 4-6 jam | Arsitektur late fusion |
-| Training A.1-A.4b | 2-3 hari | 25 runs × 100 epoch |
-| Training A.5 | 1 hari | 5 runs × 100 epoch |
-| Evaluasi & laporan | 1 hari | Generate metrik, plot, update Results |
-| **Total** | **4-6 hari** | Parallel training bisa lebih cepat |
+| Phase | Duration | Description |
+|:------|:---------|:------------|
+| Update augmentation scripts | 2-3 hours | Modify 5 training scripts |
+| Implement BN reset | 2-3 hours | Add functions + integration |
+| Implement A.5 | 4-6 hours | Late fusion architecture |
+| Training A.1-A.4b | 2-3 days | 25 runs × 100 epochs |
+| Training A.5 | 1 day | 5 runs × 100 epochs |
+| Evaluation & reporting | 1 day | Generate metrics, plots, update Results |
+| **Total** | **4-6 days** | Parallel training can accelerate |
 
 ---
 
-## Checklist Implementasi
+## Implementation Checklist
 
-### Script Training
+### Training Scripts
 
-- [x] Update `train_a1_rgb.py` - augmentasi geometri-only
-- [x] Update `train_a2_depth.py` - augmentasi + reset BN (100 real images)
-- [x] Update `train_a3_rgbd.py` - augmentasi + reset BN (100 real images, 4ch)
-- [x] Update `train_a4a_synthetic_depth.py` - augmentasi + reset BN (100 real images)
-- [x] Update `train_a4b_rgbd_synthetic.py` - augmentasi + reset BN (100 real images, 4ch)
-- [x] Buat `train_a5_late_fusion.py` - model baru
+- [x] Update `train_a1_rgb.py` - geometric-only augmentation
+- [x] Update `train_a2_depth.py` - augmentation + BN reset (100 real images)
+- [x] Update `train_a3_rgbd.py` - augmentation + BN reset (100 real images, 4ch)
+- [x] Update `train_a4a_synthetic_depth.py` - augmentation + BN reset (100 real images)
+- [x] Update `train_a4b_rgbd_synthetic.py` - augmentation + BN reset (100 real images, 4ch)
+- [x] Create `train_a5_late_fusion.py` - new model
 
-### Notebook v2 (Kaggle) - ✅ Semua Selesai
+### Notebooks v2 (Kaggle) - ✅ All Complete
 
 - [x] `train_a1_rgb_v2.ipynb` - 5 seeds, uniform aug
 - [x] `train_a2_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset (100 real images)
-- [x] `train_a3_rgbd_v2.ipynb` - 5 seeds, uniform aug + **BN reset 100 real images** + RGBD4ChTrainer + RGBD4ChValidator
+- [x] `train_a3_rgbd_v2.ipynb` - 5 seeds, uniform aug + BN reset 100 real images + RGBD4ChTrainer + RGBD4ChValidator
 - [x] `train_a4a_synthetic_depth_v2.ipynb` - 5 seeds, uniform aug + BN reset (100 real images)
-- [x] `train_a4b_rgbd_synthetic_v2.ipynb` - 5 seeds, uniform aug + **BN reset 100 real images** + RGBD4ChTrainer + RGBD4ChValidator
+- [x] `train_a4b_rgbd_synthetic_v2.ipynb` - 5 seeds, uniform aug + BN reset 100 real images + RGBD4ChTrainer + RGBD4ChValidator
 - [x] `train_a5_late_fusion_v2.ipynb` - 5 seeds, multi-scale fusion + proper YOLO loss
 
-### Modul Baru
+### New Modules
 
-- [x] `reset_bn.py` - Fungsi reset BatchNorm stats (100 real images method)
-- [x] `late_fusion_model.py` - Class LateFusionModel (multi-scale P3/P4/P5)
-- [x] `late_fusion_trainer.py` - Trainer khusus A.5 dengan v8DetectionLoss
+- [x] `reset_bn.py` - BatchNorm reset functions (100 real images method)
+- [x] `late_fusion_model.py` - LateFusionModel class (multi-scale P3/P4/P5)
+- [x] `late_fusion_trainer.py` - Custom trainer for A.5 with v8DetectionLoss
 
 ---
 
-## Struktur Output
+## Output Structure
 
 ```
-5_seed/
+5_seed_v2/
 ├── train_a1_rgb/
 │   ├── runs/detect/exp_a1_rgb_seed*/
 │   └── kaggleoutput/a1_rgb_results.txt
@@ -245,94 +245,94 @@ Input RGB (3ch)          Input Depth (3ch)
 │   └── ...
 ├── train-a4b-rgbd-synthetic/
 │   └── ...
-├── train-a5-late-fusion/          # BARU
+├── train-a5-late-fusion/          # NEW
 │   ├── runs/detect/exp_a5_fusion_seed*/
 │   └── kaggleoutput/a5_fusion_results.txt
-└── Results_v3.md                   # Update dengan A.5
+└── Results_v2.md                   # Updated with A.5
 ```
 
 ---
 
-## Catatan Penting
+## Important Notes
 
-1. **Bobot A.1 dan A.2:** Gunakan weights terbaik dari hasil training sebelumnya sebagai input untuk A.5.
+1. **A.1 and A.2 Weights:** Use best weights from previous training as input for A.5.
 
-2. **Reset BN (Critical):**
-   - Hanya untuk model depth (A.2-A.4b)
-   - **Wajib** panggil `model.model.to(DEVICE)` sebelum reset BN
-   - Gunakan **100 gambar training asli**
+2. **BN Reset (Critical):**
+   - Only for depth models (A.2-A.4b)
+   - **Must** call `model.model.to(DEVICE)` before BN reset
+   - Use **100 real training images**
 
-3. **A.5 Input:** Dataloader memuat RGB dan Depth secara terpisah (2 path), bukan 4-channel fused.
+3. **A.5 Input:** Dataloader loads RGB and Depth separately (2 paths), not 4-channel fused.
 
-4. **GPU Memory:** A.5 memerlukan 2× backbone, pertimbangkan batch size 8 jika OOM.
+4. **GPU Memory:** A.5 requires 2× backbone, consider batch size 8 if OOM.
 
 5. **Metrics Access Pattern:**
    ```python
-   # Benar (API terbaru)
+   # Correct (latest API)
    mAP50 = results.box.map50
    mAP50_95 = results.box.map
 
-   # Salah (API lama)
+   # Incorrect (old API)
    mAP50 = results.results_dict['metrics/mAP50(B)']
    ```
 
 ---
 
-## Risiko & Mitigasi
+## Risks & Mitigation
 
-| Risiko | Mitigasi |
+| Risk | Mitigation |
 |:-------|:---------|
-| Training time terlalu lama | Parallel run di multiple GPU/akun Kaggle |
-| OOM di A.5 | Batch size 16→8, atau pakai gradient accumulation |
-| Hasil A.5 tidak lebih baik | Dokumentasikan sebagai exploration, fokus ke A.1-A.4b yang sudah solid |
-| Reset BN tidak berdampak signifikan | Abaikan jika tidak ada improvement, atau jadikan ablation |
+| Training time too long | Parallel runs on multiple GPU/Kaggle accounts |
+| OOM on A.5 | Batch size 16→8, or use gradient accumulation |
+| A.5 results not better | Document as exploration, focus on A.1-A.4b |
+| BN reset no significant impact | Consider as ablation study |
 
 ---
 
 ## Update Log
 
-### 2026-01-29 - Implementasi Selesai
+### 2026-01-29 - Implementation Complete
 
-**Perubahan Teknis dari Rencana Awal:**
+**Technical Changes from Initial Plan:**
 
-1. **Reset BN Method - A.2, A.4a (3-Channel)**
-   - **Rencana:** Menggunakan `train_loader` dengan 100 batches
-   - **Implementasi:** Menggunakan **100 gambar training asli** via PIL + transforms
-   - **Alasan:** Sesuai instruksi dosen - domain adaptation lebih baik dengan real data
-   - **Impact:** Distribusi BN stats sesuai dengan data target (depth/synthetic)
+1. **BN Reset Method - A.2, A.4a (3-Channel)**
+   - **Initial Plan:** Use `train_loader` with 100 batches
+   - **Implementation:** Use **100 real training images** via PIL + transforms
+   - **Reason:** Domain adaptation works better with real data
+   - **Impact:** BN stats distribution matches target data (depth/synthetic)
 
-2. **Reset BN Method - A.3, A.4b (4-Channel RGBD)**
-   - **Rencana:** Menggunakan dummy input
-   - **Implementasi:** Menggunakan **100 gambar training asli** via callback `on_train_start`
-   - **Alasan:** Sesuai catatan dosen - domain adaptation lebih baik dengan real data
-   - **Implementation:** `RGBD4ChTrainer` dengan `_bn_reset_callback()`
+2. **BN Reset Method - A.3, A.4b (4-Channel RGBD)**
+   - **Initial Plan:** Use dummy input
+   - **Implementation:** Use **100 real training images** via callback `on_train_start`
+   - **Reason:** Domain adaptation works better with real data
+   - **Implementation:** `RGBD4ChTrainer` with `_bn_reset_callback()`
 
 3. **A.3, A.4b Custom Trainer Architecture**
    - **RGBD4ChTrainer:**
      - `get_model()` - Auto-convert 3ch → 4ch first conv layer
-     - `build_dataset()` - Override dengan `RGBDDataset` (4-channel `load_image()`)
-     - `_bn_reset_callback()` - BN reset dengan 100 real training images
+     - `build_dataset()` - Override with `RGBDDataset` (4-channel `load_image()`)
+     - `_bn_reset_callback()` - BN reset with 100 real training images
      - `get_validator()` - Return `RGBD4ChValidator`
    - **RGBD4ChValidator:**
-     - `build_dataset()` - 4-channel dataset untuk validation
+     - `build_dataset()` - 4-channel dataset for validation
      - `setup_model()` - Ensure 4ch conversion
 
 4. **Cell 8 Evaluation Fix**
-   - **Implementasi:** `evaluate_rgbd_model()` menggunakan `RGBD4ChValidator` eksplisit
-   - **Alasan:** `model.val()` default tidak handle 4-channel properly
-   - **Return:** `validator.metrics` (bukan return value dari `validator()`)
+   - **Implementation:** `evaluate_rgbd_model()` using explicit `RGBD4ChValidator`
+   - **Reason:** `model.val()` default doesn't handle 4-channel properly
+   - **Return:** `validator.metrics` (not return value from `validator()`)
 
-5. **A.5 Arsitektur**
-   - **Rencana:** Single-scale (P3 only) fusion
-   - **Implementasi:** Multi-scale (P3, P4, P5) fusion
-   - **Alasan:** YOLO Detect head memerlukan 3 level feature pyramid
+5. **A.5 Architecture**
+   - **Initial Plan:** Single-scale (P3 only) fusion
+   - **Implementation:** Multi-scale (P3, P4, P5) fusion
+   - **Reason:** YOLO Detect head requires 3 level feature pyramid
 
 6. **Device Transfer**
-   - **Tambahan:** `model.model.to(DEVICE)` sebelum BN reset (penting!)
-   - **Alasan:** Layer BN perlu di GPU sebelum forward pass
+   - **Addition:** `model.model.to(DEVICE)` before BN reset (important!)
+   - **Reason:** BN layers need to be on GPU before forward pass
 
 7. **Metrics Access**
-   - **Update:** `results.box.map50` alih-alih `results.results_dict['metrics/mAP50(B)']`
-   - **Alasan:** API Ultralytics terbaru mengubah struktur results object
+   - **Update:** `results.box.map50` instead of `results.results_dict['metrics/mAP50(B)']`
+   - **Reason:** Latest Ultralytics API changed results object structure
 
-**Status:** Semua notebook _v2 siap untuk training (30 runs total).
+**Status:** All v2 notebooks ready for training (30 runs total).
