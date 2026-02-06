@@ -3,7 +3,8 @@
 Folder ini adalah **pusat laporan final** (lebih rapi daripada `Experiments/kaggleoutput/`).
 
 ## Isi
-- `result.md`: laporan utama (narasi + tabel hasil + referensi artefak).
+- `result_summary.md`: ringkasan hasil (quick reference, tabel utama).
+- `result_full.md`: laporan lengkap (narasi + tabel hasil + visualisasi + referensi artefak).
 - `assets/`: tempat menaruh gambar yang ingin dicantumkan (contoh prediksi, PR curve, confusion matrix).
 - `snippets/`: potongan kode yang ingin dicantumkan (opsional; bisa link ke file asli di `Experiments/scripts/`).
 - `logs/`: tempat menaruh log `.txt` penting (opsional).
