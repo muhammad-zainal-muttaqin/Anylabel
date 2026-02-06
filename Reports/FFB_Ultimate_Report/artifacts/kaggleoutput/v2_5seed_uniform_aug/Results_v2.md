@@ -29,11 +29,12 @@
 | A.3 | RGB + Real Depth | **0.8403±0.0161** | 0.3687±0.0104 | 0.8019±0.0501 | **0.7743±0.0177** | 1 |
 | A.1 | RGB Only | 0.8385±0.0249 | 0.3645±0.0111 | 0.8028±0.0456 | 0.7605±0.0566 | 2 |
 | A.4b | RGB + Synthetic Depth | 0.8233±0.0122 | **0.3676±0.0074** | **0.7959±0.0341** | 0.7387±0.0403 | 3 |
-| **A.5** | **Late Fusion** | **0.8084±0.0304** | **0.3176±0.0160** | **0.7620±0.0303** | **0.7829±0.0122** | **4** |
+| **A.5** | **Late Fusion** | **0.8084±0.0304** | **0.3176±0.0150** | - | - | **4** |
 | A.2 | Real Depth Only | 0.7325±0.0419 | 0.2915±0.0118 | 0.7147±0.0379 | 0.7267±0.0125 | 5 |
 | A.4a | Synthetic Depth Only | 0.6533±0.0363 | 0.2754±0.0252 | 0.7176±0.0396 | 0.6170±0.0818 | 6 |
 
 **Note:** All experiments use **uniform augmentation**: translate=0.1, scale=0.5, fliplr=0.5, HSV/mosaic/mixup disabled.
+**Note:** A.5 Precision & Recall not available in raw notebook output; requires re-run evaluation.
 
 ### Per-Seed Details
 
@@ -115,15 +116,16 @@
 <details>
 <summary><b>A.5 - Late Fusion (V2) - COMPLETE</b></summary>
 
-| Seed | mAP50 | mAP50-95 | Precision | Recall |
-|:----:|:-----:|:--------:|:---------:|:------:|
-| 42 | 0.7610 | 0.2977 | 0.7106 | 0.7714 |
-| 123 | 0.7955 | 0.3120 | 0.7594 | 0.7810 |
-| 456 | 0.8279 | **0.3390** | **0.7911** | **0.8000** |
-| **789** | **0.8347** | 0.3205 | 0.7803 | 0.7714 |
-| 101 | 0.8229 | 0.3188 | 0.7684 | 0.7905 |
+| Seed | mAP50 | mAP50-95 |
+|:----:|:-----:|:--------:|
+| 42 | 0.7610 | 0.2977 |
+| 123 | 0.7955 | 0.3120 |
+| 456 | 0.8279 | **0.3390** |
+| **789** | **0.8347** | 0.3205 |
+| 101 | 0.8229 | 0.3188 |
 
-**Mean±Std:** 0.8084±0.0304 | **Architecture:** Dual frozen backbones + trainable fusion
+**Mean±Std (mAP50):** 0.8084±0.0304 | **Mean±Std (mAP50-95):** 0.3176±0.0150 | **Architecture:** Dual frozen backbones + trainable fusion
+**Note:** Precision & Recall not available in raw notebook output; requires re-run evaluation.
 
 </details>
 
