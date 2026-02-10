@@ -95,3 +95,22 @@ LabelingKit/
 ---
 
 *FFB Labeling Kit - Oil Palm Research*
+
+---
+
+## Uninstall Cepat
+
+Jika ingin reset instalasi dengan cepat:
+```
+Klik 2x: UNINSTALL.bat
+```
+
+`UNINSTALL.bat` menghapus:
+- `python/`
+- `venv/`
+- `output/`
+- cache Python
+
+`UNINSTALL.bat` **tidak** menghapus:
+- `Dataset/`
+- file label user (`.json`, `.txt`)
