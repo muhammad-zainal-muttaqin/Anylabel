@@ -60,7 +60,7 @@ if errorlevel 1 (
                 %PYTHON_EXE% -c "import ultralytics" >nul 2>&1
                 if errorlevel 1 (
                     echo [ERROR] ultralytics masih belum siap dipakai.
-                    echo         Coba jalankan ulang AUTO_LABEL_ALL (opsional).bat.
+                    echo         Coba jalankan ulang file auto-label opsional.
                     pause
                     exit /b 1
                 )
