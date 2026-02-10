@@ -15,7 +15,7 @@ if exist "python\python.exe" (
     where python >nul 2>&1
     if errorlevel 1 (
         echo [ERROR] Python tidak ditemukan.
-        echo         Jalankan INSTALL.bat dulu.
+        echo         Jalankan 1_INSTALL.bat dulu.
         pause
         exit /b 1
     )
@@ -60,7 +60,7 @@ if errorlevel 1 (
                 %PYTHON_EXE% -c "import ultralytics" >nul 2>&1
                 if errorlevel 1 (
                     echo [ERROR] ultralytics masih belum siap dipakai.
-                    echo         Coba jalankan ulang AUTO_LABEL_ALL.bat.
+                    echo         Coba jalankan ulang AUTO_LABEL_ALL (opsional).bat.
                     pause
                     exit /b 1
                 )

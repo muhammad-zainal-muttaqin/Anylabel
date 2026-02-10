@@ -45,11 +45,11 @@ exit /b 0
 echo.
 echo [ERROR] AnyLabeling gagal dibuka.
 echo Kemungkinan penyebab:
-echo   1. INSTALL.bat belum selesai/berhasil
+echo   1. 1_INSTALL.bat belum selesai/berhasil
 echo   2. Dependency belum terpasang sempurna
 echo   3. Path folder dipindahkan saat proses install
 echo.
-echo Jalankan ulang INSTALL.bat, lalu coba START.bat lagi.
+echo Jalankan ulang 1_INSTALL.bat, lalu coba 2_START_LABELING.bat lagi.
 echo.
 pause
 exit /b 1

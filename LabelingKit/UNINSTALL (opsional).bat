@@ -17,8 +17,8 @@ echo Data yang TIDAK dihapus:
 echo   - Dataset\
 echo   - file label (.json/.txt) milik user
 echo.
-set /p CONFIRM="Lanjut uninstall? (Y/N): "
-if /I not "%CONFIRM%"=="Y" (
+choice /C YN /N /M "Lanjut uninstall? (Y/N): "
+if errorlevel 2 (
     echo.
     echo Dibatalkan.
     pause
@@ -58,6 +58,6 @@ echo ========================================
 echo   Uninstall selesai
 echo ========================================
 echo.
-echo Jika ingin pakai lagi, jalankan INSTALL.bat
+echo Jika ingin pakai lagi, jalankan 1_INSTALL.bat
 echo.
 pause

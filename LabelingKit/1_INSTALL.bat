@@ -28,7 +28,6 @@ if exist "%PYTHON_DIR%\python.exe" (
     echo       Python portable sudah ada.
     set "USE_PORTABLE=1"
     set "PYTHON_EXE=%PYTHON_DIR%\python.exe"
-    set "PIP_EXE=%PYTHON_DIR%\Scripts\pip.exe"
     goto :install_deps
 )
 
@@ -40,21 +39,20 @@ if defined PYTHON_ZIP (
     echo       Mengekstrak %PYTHON_ZIP%...
     if not exist "%PYTHON_DIR%" mkdir "%PYTHON_DIR%"
     powershell -Command "Expand-Archive -Path '%PYTHON_ZIP%' -DestinationPath '%PYTHON_DIR%' -Force"
-    
-    :: Enable pip support - uncomment import site
+
+    :: Enable pip support
     for %%f in (%PYTHON_DIR%\python*._pth) do (
         powershell -Command "(Get-Content '%%f') -replace '#import site', 'import site' | Set-Content '%%f'"
     )
-    
+
     :: Install pip
     echo       Menginstall pip...
     powershell -Command "& {$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -Uri '%GET_PIP_URL%' -OutFile '%PYTHON_DIR%\get-pip.py'}" 2>nul
     %PYTHON_DIR%\python.exe %PYTHON_DIR%\get-pip.py --quiet 2>nul
     del "%PYTHON_DIR%\get-pip.py" 2>nul
-    
+
     set "USE_PORTABLE=1"
     set "PYTHON_EXE=%PYTHON_DIR%\python.exe"
-    set "PIP_EXE=%PYTHON_DIR%\Scripts\pip.exe"
     goto :install_deps
 )
 
@@ -63,7 +61,6 @@ python --version >nul 2>&1
 if not errorlevel 1 (
     echo       Menggunakan Python sistem...
     set "PYTHON_EXE=python"
-    set "PIP_EXE=pip"
     goto :install_deps
 )
 
@@ -73,7 +70,7 @@ echo.
 echo Download Python dari:
 echo   https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip
 echo.
-echo Simpan file ZIP di folder ini, lalu jalankan INSTALL.bat lagi.
+echo Simpan file ZIP di folder ini, lalu jalankan 1_INSTALL.bat lagi.
 echo.
 pause
 exit /b 1
@@ -86,11 +83,9 @@ echo [2/3] Menginstall dependencies...
 echo       (AnyLabeling, OpenCV, dll - mohon tunggu...)
 
 if "%USE_PORTABLE%"=="1" (
-    :: Install directly to portable Python
     %PYTHON_DIR%\python.exe -m pip install --upgrade pip --quiet 2>nul
     %PYTHON_DIR%\python.exe -m pip install -r "%REQUIREMENTS_FILE%" --quiet
 ) else (
-    :: Use system Python with pip
     python -m pip install --upgrade pip --quiet 2>nul
     pip install -r "%REQUIREMENTS_FILE%" --quiet
 )
@@ -106,13 +101,13 @@ echo       Menerapkan hotfix AnyLabeling...
 %PYTHON_EXE% _internal\scripts\fix_anylabeling_colormap.py >nul 2>&1
 if errorlevel 1 (
     echo [WARNING] Hotfix AnyLabeling gagal dijalankan.
-    echo          Instalasi tetap lanjut, coba START.bat dulu.
+    echo          Instalasi tetap lanjut, coba 2_START_LABELING.bat dulu.
 )
 
 if "%USE_PORTABLE%"=="1" (
     if not exist "python\Scripts\anylabeling.exe" (
         echo [WARNING] anylabeling.exe tidak ditemukan di python\Scripts\
-        echo          START.bat akan mencoba fallback via python module.
+        echo          2_START_LABELING.bat akan mencoba fallback via python module.
     )
 )
 
@@ -120,19 +115,15 @@ if "%USE_PORTABLE%"=="1" (
 :: STEP 3: Create Output Folder
 :: ========================================
 echo [3/3] Menyiapkan folder output...
-
 if not exist "output" mkdir "output"
 
-:: ========================================
-:: DONE
-:: ========================================
 echo.
 echo ========================================
 echo   Instalasi Selesai!
 echo ========================================
 echo.
 echo Langkah selanjutnya:
-echo   1. Klik 2x: START.bat
+echo   1. Klik 2x: 2_START_LABELING.bat
 echo   2. Pilih folder kelompok kamu di Dataset\
 echo.
 echo Tools opsional:

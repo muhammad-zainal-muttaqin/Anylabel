@@ -14,7 +14,7 @@ if exist "python\python.exe" (
     where python >nul 2>&1
     if errorlevel 1 (
         echo [ERROR] Python tidak ditemukan.
-        echo         Jalankan INSTALL.bat dulu.
+        echo         Jalankan 1_INSTALL.bat dulu.
         pause
         exit /b 1
     )

@@ -13,6 +13,12 @@ from pathlib import Path
 
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+LABEL_REMAP = {
+    "ripe": "B1",
+    "unripe": "B2",
+    "matang": "B1",
+    "mentah": "B2",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -24,6 +30,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--imgsz", type=int, default=640, help="Inference image size (default: 640)")
     parser.add_argument("--recursive", action="store_true", help="Scan images recursively")
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing JSON labels")
+    parser.add_argument(
+        "--disable_label_remap",
+        action="store_true",
+        help="Disable default remap (ripe->B1, unripe->B2)",
+    )
     return parser.parse_args()
 
 
@@ -35,7 +46,13 @@ def collect_images(images_dir: Path, recursive: bool) -> list[Path]:
     return sorted(files)
 
 
-def to_labelme_json(image_path: Path, result) -> dict:
+def remap_label(raw_label: str, disable_remap: bool) -> str:
+    if disable_remap:
+        return raw_label
+    return LABEL_REMAP.get(raw_label.strip().lower(), raw_label)
+
+
+def to_labelme_json(image_path: Path, result, disable_remap: bool = False) -> dict:
     h, w = result.orig_shape
     names = result.names
     shapes = []
@@ -47,7 +64,8 @@ def to_labelme_json(image_path: Path, result) -> dict:
 
         for box, cls_id, conf in zip(xyxy, cls_ids, confs):
             x1, y1, x2, y2 = box
-            label = names[int(cls_id)] if isinstance(names, dict) else str(int(cls_id))
+            raw_label = names[int(cls_id)] if isinstance(names, dict) else str(int(cls_id))
+            label = remap_label(str(raw_label), disable_remap)
             shapes.append(
                 {
                     "label": label,
@@ -106,6 +124,10 @@ def main() -> int:
     print(f"Conf / IoU : {args.conf} / {args.iou}")
     print(f"Recursive  : {args.recursive}")
     print(f"Overwrite  : {args.overwrite}")
+    if args.disable_label_remap:
+        print("Label map  : disabled")
+    else:
+        print("Label map  : ripe->B1, unripe->B2")
     print()
 
     model = YOLO(str(model_path))
@@ -130,7 +152,7 @@ def main() -> int:
                 verbose=False,
             )[0]
 
-            data = to_labelme_json(image_path, result)
+            data = to_labelme_json(image_path, result, disable_remap=args.disable_label_remap)
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
 

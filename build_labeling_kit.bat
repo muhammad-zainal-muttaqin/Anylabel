@@ -55,9 +55,9 @@ if exist "%OUTPUT_ZIP%" (
     echo.
     echo Transfer this ZIP to another computer and:
     echo   1. Extract the ZIP
-    echo   2. Run INSTALL.bat
-    echo   3. Run START.bat
-    echo   4. Optional: AUTO_LABEL_ALL.bat
+    echo   2. Run 1_INSTALL.bat
+    echo   3. Run 2_START_LABELING.bat
+    echo   4. Optional: AUTO_LABEL_ALL (opsional).bat
     echo.
 ) else (
     echo [ERROR] Failed to create ZIP
