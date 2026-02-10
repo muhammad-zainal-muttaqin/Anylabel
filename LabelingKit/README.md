@@ -2,19 +2,33 @@
 
 Toolkit untuk anotasi Fresh Fruit Bunch (FFB) kelapa sawit.
 
-## Workflow Cepat
+## Workflow Cepat (Manual Labeling)
 
 1. Jalankan `INSTALL.bat` (sekali saja).
 2. Jalankan `START.bat`.
-3. Di AnyLabeling pilih folder dari `Dataset\...`.
+3. Di AnyLabeling pilih folder `images` dari kelompok yang ingin dilabel.
+4. Kelas default otomatis muncul: `B1`, `B2`, `B3`, `B4`.
+
+Contoh:
+- `Dataset\Damimas\Kelompok 1\images`
+- `Dataset\Lonsum\Kelompok 5\images`
 
 ## Auto Label (Opsional)
 
 Jalankan `AUTO_LABEL_ALL.bat` untuk pre-label otomatis satu folder.
 
-- Input folder contoh: `Dataset\Lonsum\Kelompok 5`
+- Saat diminta `Folder gambar`, isi folder `images`, contoh:
+  - `Dataset\Lonsum\Kelompok 5\images`
 - Model default (jika ada): `models\ffb_autolabel_stage1_seed42_best.pt`
-- Output: file `.json` di samping gambar
+- Confidence: tekan `Enter` untuk default `0.25`
+- Output: file `.json` dibuat di samping gambar (di folder `images`)
+
+Urutan prompt `AUTO_LABEL_ALL.bat`:
+1. Install `ultralytics`? (`Y/N`)
+2. Jika perlu, install `torch + torchvision`? (`Y/N`)
+3. Folder gambar
+4. Path model YOLO
+5. Confidence
 
 ## Tools Tambahan
 
@@ -55,8 +69,9 @@ LabelingKit/
 
 - Python tidak ditemukan: simpan `python-3.12.10-embed-amd64.zip` di root `LabelingKit`, lalu jalankan `INSTALL.bat`.
 - Auto-label butuh `ultralytics`: pilih `Y` saat diminta install (mode ringan `--no-deps`).
-- Jika auto-label gagal import setelah install ringan, jalankan:
-  - `python -m pip install torch torchvision`
+- Jika setelah install ringan muncul warning dependency, itu normal. Lanjutkan sampai prompt folder gambar muncul.
+- Jika auto-label tetap gagal import, install dependency ini:
+  - `python\python.exe -m pip install torch torchvision`
 
 ## Uninstall Cepat
 

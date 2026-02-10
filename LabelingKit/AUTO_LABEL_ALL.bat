@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 cd /d "%~dp0"
 
 echo.
@@ -25,8 +25,13 @@ if exist "python\python.exe" (
 %PYTHON_EXE% -c "import ultralytics" >nul 2>&1
 if errorlevel 1 (
     echo [INFO] ultralytics belum terpasang.
-    set /p INSTALL_ULTRA="Install ultralytics sekarang? (Y/N): "
-    if /I "%INSTALL_ULTRA%"=="Y" (
+    choice /C YN /N /M "Install ultralytics sekarang? (Y/N): "
+    if errorlevel 2 (
+        echo Dibatalkan.
+        pause
+        exit /b 0
+    )
+    if errorlevel 1 (
         echo [INFO] Installing lightweight ultralytics...
         %PYTHON_EXE% -m pip install -qU ultralytics --no-deps
         if errorlevel 1 (
@@ -36,16 +41,31 @@ if errorlevel 1 (
         )
         %PYTHON_EXE% -c "import ultralytics" >nul 2>&1
         if errorlevel 1 (
-            echo [ERROR] ultralytics terpasang tapi belum bisa dipakai.
-            echo         Coba install dependency minimal ini:
-            echo         %PYTHON_EXE% -m pip install torch torchvision
-            pause
-            exit /b 1
+            echo [WARNING] ultralytics terpasang tapi belum bisa dipakai.
+            echo           Kemungkinan torch/torchvision belum ada.
+            choice /C YN /N /M "Install torch + torchvision sekarang? (Y/N): "
+            if errorlevel 2 (
+                echo Dibatalkan.
+                pause
+                exit /b 0
+            )
+            if errorlevel 1 (
+                echo [INFO] Installing torch and torchvision...
+                %PYTHON_EXE% -m pip install torch torchvision
+                if errorlevel 1 (
+                    echo [ERROR] Gagal install torch/torchvision.
+                    pause
+                    exit /b 1
+                )
+                %PYTHON_EXE% -c "import ultralytics" >nul 2>&1
+                if errorlevel 1 (
+                    echo [ERROR] ultralytics masih belum siap dipakai.
+                    echo         Coba jalankan ulang AUTO_LABEL_ALL.bat.
+                    pause
+                    exit /b 1
+                )
+            )
         )
-    ) else (
-        echo Dibatalkan.
-        pause
-        exit /b 0
     )
 )
 

@@ -1,6 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+set "LABELS_FILE=_internal\configs\classes.txt"
 
 echo.
 echo Membuka AnyLabeling...
@@ -15,14 +16,14 @@ if exist "python\python.exe" (
 
 :: Preferred: portable AnyLabeling executable
 if exist "python\Scripts\anylabeling.exe" (
-    "python\Scripts\anylabeling.exe"
+    "python\Scripts\anylabeling.exe" --labels "%LABELS_FILE%"
     if errorlevel 1 goto :launch_failed
     exit /b 0
 )
 
 :: Fallback: portable python module
 if exist "python\python.exe" (
-    "python\python.exe" -m anylabeling
+    "python\python.exe" -m anylabeling --labels "%LABELS_FILE%"
     if errorlevel 1 goto :launch_failed
     exit /b 0
 )
@@ -30,13 +31,13 @@ if exist "python\python.exe" (
 :: Fallback: system command
 where anylabeling >nul 2>&1
 if not errorlevel 1 (
-    anylabeling
+    anylabeling --labels "%LABELS_FILE%"
     if errorlevel 1 goto :launch_failed
     exit /b 0
 )
 
 :: Last fallback: system python module
-python -m anylabeling
+python -m anylabeling --labels "%LABELS_FILE%"
 if errorlevel 1 goto :launch_failed
 exit /b 0
 

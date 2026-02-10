@@ -1,6 +1,7 @@
-# Class definitions for FFB labeling
+# Default class list for labeling
 # One class per line
-# Format: class_name
-# Class ID is automatically assigned based on line order (0, 1, 2, ...)
 
-fresh_fruit_bunch
+B1
+B2
+B3
+B4
