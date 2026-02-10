@@ -31,10 +31,6 @@ if exist "%SOURCE_DIR%\python" (
     echo Removing portable python from package...
     rmdir /s /q "%SOURCE_DIR%\python"
 )
-if exist "%SOURCE_DIR%\workspace" (
-    echo Removing workspace from package...
-    rmdir /s /q "%SOURCE_DIR%\workspace"
-)
 if exist "%SOURCE_DIR%\output" (
     echo Removing output from package...
     rmdir /s /q "%SOURCE_DIR%\output"
@@ -59,9 +55,9 @@ if exist "%OUTPUT_ZIP%" (
     echo.
     echo Transfer this ZIP to another computer and:
     echo   1. Extract the ZIP
-    echo   2. Run setup.bat
-    echo   3. Copy images to workspace\images\
-    echo   4. Run run_labeling.bat
+    echo   2. Run INSTALL.bat
+    echo   3. Run START.bat
+    echo   4. Optional: AUTO_LABEL_ALL.bat
     echo.
 ) else (
     echo [ERROR] Failed to create ZIP

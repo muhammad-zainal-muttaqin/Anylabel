@@ -6,6 +6,13 @@ echo.
 echo Membuka AnyLabeling...
 echo.
 
+:: Apply startup hotfix (safe to run multiple times)
+if exist "python\python.exe" (
+    "python\python.exe" _internal\scripts\fix_anylabeling_colormap.py >nul 2>&1
+) else (
+    python _internal\scripts\fix_anylabeling_colormap.py >nul 2>&1
+)
+
 :: Preferred: portable AnyLabeling executable
 if exist "python\Scripts\anylabeling.exe" (
     "python\Scripts\anylabeling.exe"

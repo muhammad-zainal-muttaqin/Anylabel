@@ -15,6 +15,7 @@ pause
 set "PYTHON_DIR=python"
 set "GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py"
 set "USE_PORTABLE=0"
+set "REQUIREMENTS_FILE=_internal\requirements.txt"
 
 :: ========================================
 :: STEP 1: Setup Python
@@ -87,11 +88,11 @@ echo       (AnyLabeling, OpenCV, dll - mohon tunggu...)
 if "%USE_PORTABLE%"=="1" (
     :: Install directly to portable Python
     %PYTHON_DIR%\python.exe -m pip install --upgrade pip --quiet 2>nul
-    %PYTHON_DIR%\python.exe -m pip install -r requirements.txt --quiet
+    %PYTHON_DIR%\python.exe -m pip install -r "%REQUIREMENTS_FILE%" --quiet
 ) else (
     :: Use system Python with pip
     python -m pip install --upgrade pip --quiet 2>nul
-    pip install -r requirements.txt --quiet
+    pip install -r "%REQUIREMENTS_FILE%" --quiet
 )
 
 if errorlevel 1 (
@@ -99,6 +100,13 @@ if errorlevel 1 (
     echo         Pastikan koneksi internet stabil.
     pause
     exit /b 1
+)
+
+echo       Menerapkan hotfix AnyLabeling...
+%PYTHON_EXE% _internal\scripts\fix_anylabeling_colormap.py >nul 2>&1
+if errorlevel 1 (
+    echo [WARNING] Hotfix AnyLabeling gagal dijalankan.
+    echo          Instalasi tetap lanjut, coba START.bat dulu.
 )
 
 if "%USE_PORTABLE%"=="1" (
@@ -126,5 +134,9 @@ echo.
 echo Langkah selanjutnya:
 echo   1. Klik 2x: START.bat
 echo   2. Pilih folder kelompok kamu di Dataset\
+echo.
+echo Tools opsional:
+echo   - tools\CHECK_PROGRESS.bat
+echo   - tools\CONVERT_TO_YOLO.bat
 echo.
 pause
