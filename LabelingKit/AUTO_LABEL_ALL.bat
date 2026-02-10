@@ -27,9 +27,18 @@ if errorlevel 1 (
     echo [INFO] ultralytics belum terpasang.
     set /p INSTALL_ULTRA="Install ultralytics sekarang? (Y/N): "
     if /I "%INSTALL_ULTRA%"=="Y" (
-        %PYTHON_EXE% -m pip install ultralytics
+        echo [INFO] Installing lightweight ultralytics...
+        %PYTHON_EXE% -m pip install -qU ultralytics --no-deps
         if errorlevel 1 (
             echo [ERROR] Gagal install ultralytics.
+            pause
+            exit /b 1
+        )
+        %PYTHON_EXE% -c "import ultralytics" >nul 2>&1
+        if errorlevel 1 (
+            echo [ERROR] ultralytics terpasang tapi belum bisa dipakai.
+            echo         Coba install dependency minimal ini:
+            echo         %PYTHON_EXE% -m pip install torch torchvision
             pause
             exit /b 1
         )

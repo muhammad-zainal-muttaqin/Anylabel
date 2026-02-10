@@ -54,7 +54,9 @@ LabelingKit/
 ## Troubleshooting
 
 - Python tidak ditemukan: simpan `python-3.12.10-embed-amd64.zip` di root `LabelingKit`, lalu jalankan `INSTALL.bat`.
-- Auto-label butuh `ultralytics`: pilih `Y` saat diminta install.
+- Auto-label butuh `ultralytics`: pilih `Y` saat diminta install (mode ringan `--no-deps`).
+- Jika auto-label gagal import setelah install ringan, jalankan:
+  - `python -m pip install torch torchvision`
 
 ## Uninstall Cepat
 
