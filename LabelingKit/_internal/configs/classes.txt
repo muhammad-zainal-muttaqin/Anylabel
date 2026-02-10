@@ -1,6 +1,3 @@
-# Default class list for labeling
-# One class per line
-
 B1
 B2
 B3
