@@ -8,6 +8,15 @@ catatan.txt
 # Dataset (large files)
 Dataset/
 
+# LabelingKit dataset images and labels
+LabelingKit/Dataset/**/*.jpg
+LabelingKit/Dataset/**/*.jpeg
+LabelingKit/Dataset/**/*.png
+LabelingKit/Dataset/**/*.json
+LabelingKit/venv/
+LabelingKit/python/
+LabelingKit/output/
+
 # Experiments Results (auto-generated)
 Experiments/datasets/
 Experiments/runs/

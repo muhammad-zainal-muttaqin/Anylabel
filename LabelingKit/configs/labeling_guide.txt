@@ -1,0 +1,35 @@
+================================================================================
+                    FFB (Fresh Fruit Bunch) Labeling Guide
+================================================================================
+
+CLASSES:
+--------
+1. fresh_fruit_bunch - Tandan Buah Segar kelapa sawit
+
+LABELING RULES:
+---------------
+1. Gunakan tool "Rectangle" di AnyLabeling
+2. Buat bounding box yang mengelilingi SELURUH buah (tidak terlalu ketat/longgar)
+3. Label SEMUA FFB yang terlihat dalam gambar
+4. Jika FFB tertutup sebagian (>50% terlihat), tetap label
+5. Jika FFB terlalu kecil/blur untuk diidentifikasi, skip
+
+TIPS:
+-----
+- Zoom in untuk akurasi lebih baik
+- Gunakan keyboard shortcut:
+  - R: Rectangle tool
+  - D: Delete selected
+  - A: Previous image
+  - D: Next image
+  - Ctrl+S: Save
+- Save sering-sering!
+
+QUALITY CHECKLIST:
+------------------
+[ ] Semua FFB dalam gambar sudah dilabel
+[ ] Bounding box tidak terlalu besar/kecil
+[ ] Label name sudah benar (fresh_fruit_bunch)
+[ ] File sudah di-save
+
+================================================================================

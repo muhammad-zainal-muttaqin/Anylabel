@@ -1,0 +1,129 @@
+"""
+Show labeling statistics from JSON label files
+Portable version for LabelingKit
+
+Usage:
+    python scripts/label_stats.py
+    python scripts/label_stats.py --labels workspace/labels
+"""
+
+import json
+import argparse
+from pathlib import Path
+from collections import Counter
+
+
+def analyze_json_label(json_path):
+    """Analyze a single JSON label file"""
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    shapes = data.get('shapes', [])
+    labels = [s.get('label', 'unknown') for s in shapes]
+    shape_types = [s.get('shape_type', 'unknown') for s in shapes]
+    
+    return {
+        'num_objects': len(shapes),
+        'labels': labels,
+        'shape_types': shape_types,
+        'width': data.get('imageWidth', 0),
+        'height': data.get('imageHeight', 0)
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Show labeling statistics')
+    parser.add_argument('--labels', '-l', type=str, default='workspace/labels',
+                        help='Directory containing JSON label files')
+    args = parser.parse_args()
+    
+    # Resolve paths relative to script location
+    script_dir = Path(__file__).resolve().parent.parent
+    labels_dir = script_dir / args.labels
+    
+    print("=" * 60)
+    print("  Labeling Statistics")
+    print("=" * 60)
+    print(f"Labels directory: {labels_dir}")
+    print()
+    
+    if not labels_dir.exists():
+        print(f"[ERROR] Labels directory not found: {labels_dir}")
+        return
+    
+    json_files = list(labels_dir.glob('*.json'))
+    
+    if not json_files:
+        print("[WARNING] No JSON label files found")
+        return
+    
+    # Collect statistics
+    total_objects = 0
+    all_labels = []
+    all_shape_types = []
+    objects_per_image = []
+    image_sizes = Counter()
+    
+    for json_file in json_files:
+        try:
+            stats = analyze_json_label(json_file)
+            total_objects += stats['num_objects']
+            all_labels.extend(stats['labels'])
+            all_shape_types.extend(stats['shape_types'])
+            objects_per_image.append(stats['num_objects'])
+            
+            size_key = f"{stats['width']}x{stats['height']}"
+            image_sizes[size_key] += 1
+            
+        except Exception as e:
+            print(f"[WARNING] Error reading {json_file.name}: {e}")
+    
+    # Display statistics
+    print(f"Total label files: {len(json_files)}")
+    print(f"Total objects:     {total_objects}")
+    print()
+    
+    # Class distribution
+    label_counts = Counter(all_labels)
+    print("Class Distribution:")
+    print("-" * 40)
+    for label, count in label_counts.most_common():
+        pct = count / total_objects * 100 if total_objects > 0 else 0
+        bar_len = int(pct / 5)
+        bar = '█' * bar_len
+        print(f"  {label:25s} {count:5d} ({pct:5.1f}%) {bar}")
+    print()
+    
+    # Shape types
+    shape_counts = Counter(all_shape_types)
+    print("Shape Types:")
+    print("-" * 40)
+    for shape, count in shape_counts.most_common():
+        print(f"  {shape:25s} {count:5d}")
+    print()
+    
+    # Objects per image
+    if objects_per_image:
+        avg_objects = sum(objects_per_image) / len(objects_per_image)
+        min_objects = min(objects_per_image)
+        max_objects = max(objects_per_image)
+        empty_images = objects_per_image.count(0)
+        
+        print("Objects per Image:")
+        print("-" * 40)
+        print(f"  Average: {avg_objects:.2f}")
+        print(f"  Min:     {min_objects}")
+        print(f"  Max:     {max_objects}")
+        print(f"  Empty:   {empty_images} images")
+    print()
+    
+    # Image sizes
+    print("Image Sizes:")
+    print("-" * 40)
+    for size, count in image_sizes.most_common():
+        print(f"  {size:15s} {count:5d} images")
+    print()
+
+
+if __name__ == "__main__":
+    main()
