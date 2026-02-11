@@ -104,11 +104,11 @@ if errorlevel 1 (
     echo          Instalasi tetap lanjut, coba 2_START_LABELING.bat dulu.
 )
 
-if "%USE_PORTABLE%"=="1" (
-    if not exist "python\Scripts\anylabeling.exe" (
-        echo [WARNING] anylabeling.exe tidak ditemukan di python\Scripts\
-        echo          2_START_LABELING.bat akan mencoba fallback via python module.
-    )
+:: Verify anylabeling module is importable
+%PYTHON_EXE% -c "import anylabeling" >nul 2>&1
+if errorlevel 1 (
+    echo [WARNING] Module anylabeling tidak ditemukan.
+    echo          Coba jalankan ulang 1_INSTALL.bat.
 )
 
 :: ========================================
@@ -129,5 +129,6 @@ echo.
 echo Tools opsional:
 echo   - tools\CHECK_PROGRESS.bat
 echo   - tools\CONVERT_TO_YOLO.bat
+echo   - tools\EXTRACT_VIDEO_FRAMES.bat
 echo.
 pause

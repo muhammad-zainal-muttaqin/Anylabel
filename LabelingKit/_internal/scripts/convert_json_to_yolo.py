@@ -7,9 +7,37 @@ import json
 from pathlib import Path
 
 
-CLASS_MAPPING = {
-    "fresh_fruit_bunch": 0,
-}
+DEFAULT_RIPENESS_CLASSES = ["B1", "B2", "B3", "B4"]
+
+
+def load_classes_from_file(path: Path) -> list[str]:
+    if not path.exists():
+        return []
+
+    classes: list[str] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        label = line.strip()
+        if not label or label.startswith("#"):
+            continue
+        classes.append(label)
+    return classes
+
+
+def build_class_mapping(root_dir: Path) -> dict[str, int]:
+    default_file = (root_dir / "_internal" / "configs" / "classes.txt").resolve()
+    class_names = load_classes_from_file(default_file)
+    if not class_names:
+        class_names = list(DEFAULT_RIPENESS_CLASSES)
+
+    unique_names: list[str] = []
+    seen: set[str] = set()
+    for name in class_names:
+        if name in seen:
+            continue
+        seen.add(name)
+        unique_names.append(name)
+
+    return {name: idx for idx, name in enumerate(unique_names)}
 
 
 def convert_rectangle_to_yolo(points, img_width, img_height):
@@ -79,13 +107,15 @@ def main() -> int:
     root_dir = Path(__file__).resolve().parents[2]
     labels_dir = (root_dir / args.input).resolve()
     output_dir = (root_dir / args.output).resolve()
+    class_mapping = build_class_mapping(root_dir=root_dir)
 
     print("=" * 60)
     print("  JSON to YOLO Converter")
     print("=" * 60)
     print(f"Input:  {labels_dir}")
     print(f"Output: {output_dir}")
-    print(f"Classes: {CLASS_MAPPING}")
+    print("Mode: ripeness (fixed 4 classes)")
+    print(f"Classes: {class_mapping}")
     print(f"Recursive: {args.recursive}")
     print(f"Preserve structure: {args.preserve_structure}")
     print()
@@ -111,7 +141,7 @@ def main() -> int:
             else:
                 out_txt = output_dir / f"{json_file.stem}.txt"
 
-            num_objects = convert_json_to_yolo(json_file, out_txt, CLASS_MAPPING)
+            num_objects = convert_json_to_yolo(json_file, out_txt, class_mapping)
             converted += 1
             total_objects += num_objects
             if num_objects == 0:

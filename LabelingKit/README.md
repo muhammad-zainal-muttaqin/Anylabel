@@ -15,6 +15,25 @@ Contoh:
 - `Dataset\Damimas\Kelompok 1\images`
 - `Dataset\Lonsum\Kelompok 5\images`
 
+## Labeling Video (Disarankan)
+
+AnyLabeling di workflow ini digunakan untuk **folder gambar**, bukan file video langsung.
+
+Gunakan alur berikut:
+
+1. Ekstrak video ke frame gambar dengan `tools\EXTRACT_VIDEO_FRAMES.bat`
+2. Hasil default ada di:
+   - `Dataset\Video\<nama_video>\images`
+3. Jalankan `2_START_LABELING.bat`
+4. Di AnyLabeling, buka folder `images` hasil ekstraksi
+5. (Opsional) Jalankan `AUTO_LABEL_ALL (opsional).bat` untuk pre-label
+6. Review dan koreksi label manual
+7. Konversi JSON ke YOLO dengan `tools\CONVERT_TO_YOLO.bat`
+
+Saran awal ekstraksi:
+- `FPS=1` sampai `FPS=3` untuk video kebun normal
+- Mulai dari `FPS=2`, naikkan jika objek bergerak cepat atau scene berubah drastis
+
 ## Auto Label (Opsional)
 
 Jalankan `AUTO_LABEL_ALL (opsional).bat` untuk pre-label otomatis satu folder.
@@ -42,6 +61,13 @@ Semua tools tambahan ada di folder `tools\`:
 
 - `tools\CHECK_PROGRESS.bat`: cek progres dan statistik labeling
 - `tools\CONVERT_TO_YOLO.bat`: konversi JSON ke YOLO TXT
+- `tools\EXTRACT_VIDEO_FRAMES.bat`: ekstrak video ke frame gambar (`images`)
+
+### Mode Konversi JSON -> YOLO
+
+`tools\CONVERT_TO_YOLO.bat` sekarang dikunci ke mode **Ripeness 4 kelas**:
+- Kelas dibaca dari `_internal\configs\classes.txt`
+- Fallback default: `B1,B2,B3,B4`
 
 ## Struktur Folder (Rapih)
 
@@ -56,7 +82,8 @@ LabelingKit/
 ├── models/
 ├── tools/
 │   ├── CHECK_PROGRESS.bat
-│   └── CONVERT_TO_YOLO.bat
+│   ├── CONVERT_TO_YOLO.bat
+│   └── EXTRACT_VIDEO_FRAMES.bat
 └── _internal/
     ├── requirements.txt
     ├── configs/

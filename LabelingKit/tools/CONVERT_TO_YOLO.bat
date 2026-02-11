@@ -30,6 +30,8 @@ set /p OUTPUT_DIR="Folder output YOLO [Enter=output\yolo]: "
 if "%OUTPUT_DIR%"=="" set "OUTPUT_DIR=output\yolo"
 
 echo.
+echo Mode kelas fixed: Ripeness (B1, B2, B3, B4)
+echo.
 %PYTHON_EXE% _internal\scripts\convert_json_to_yolo.py --input "%INPUT_DIR%" --output "%OUTPUT_DIR%" --recursive --preserve_structure
 echo.
 pause
