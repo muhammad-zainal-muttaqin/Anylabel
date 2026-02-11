@@ -104,8 +104,8 @@ if errorlevel 1 (
     echo          Instalasi tetap lanjut, coba 2_START_LABELING.bat dulu.
 )
 
-:: Verify anylabeling module is importable
-%PYTHON_EXE% -c "import anylabeling" >nul 2>&1
+:: Verify anylabeling entry point is importable
+%PYTHON_EXE% -c "from anylabeling.app import main" >nul 2>&1
 if errorlevel 1 (
     echo [WARNING] Module anylabeling tidak ditemukan.
     echo          Coba jalankan ulang 1_INSTALL.bat.

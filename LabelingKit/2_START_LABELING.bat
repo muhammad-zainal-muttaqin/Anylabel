@@ -14,9 +14,9 @@ if exist "python\python.exe" (
     python _internal\scripts\fix_anylabeling_colormap.py >nul 2>&1
 )
 
-:: Preferred: portable python module (no hardcoded paths, works after folder move)
+:: Preferred: portable python, call entry point directly (no hardcoded paths)
 if exist "python\python.exe" (
-    "python\python.exe" -m anylabeling --labels "%LABELS_FILE%"
+    "python\python.exe" -c "from anylabeling.app import main; main()" --labels "%LABELS_FILE%"
     if errorlevel 1 goto :launch_failed
     exit /b 0
 )
@@ -29,8 +29,8 @@ if not errorlevel 1 (
     exit /b 0
 )
 
-:: Last fallback: system python module
-python -m anylabeling --labels "%LABELS_FILE%"
+:: Last fallback: system python
+python -c "from anylabeling.app import main; main()" --labels "%LABELS_FILE%"
 if errorlevel 1 goto :launch_failed
 exit /b 0
 
